@@ -27,6 +27,10 @@ public class VoteService {
         return voteRepository.findByUserUsername(user);
     }
 
+    public List<Vote> getByUserId(Long id) {
+        return voteRepository.findByUserId(id);
+    }
+
     public Optional<Vote> getById(Long id) {
         return voteRepository.findById(id);
     }
