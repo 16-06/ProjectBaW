@@ -14,4 +14,6 @@ public interface VoteRepository extends JpaRepository<Vote,Long> {
     List<Vote> findByUser(User user);
 
     List<Vote> findByUserUsername(String userUsername);
+
+    List<Vote> findByUserId(long userId);
 }
