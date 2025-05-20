@@ -4,6 +4,7 @@ import com.example.projectbaw.mapper.UserMapper;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.repository.UserRepository;
+import com.example.projectbaw.role.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,14 @@ public class UserService {
     @Transactional
     public void registerUser(UserDto.RequestDto requestDto) {
 
+        if(userRepository.existsByUsername(requestDto.getUsername())){
+            throw new IllegalArgumentException("User already exists");
+        }
+
         User user = new User();
         user.setUsername(userMapper.toEntity(requestDto).getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(userMapper.toEntity(requestDto).getPassword()));
+        user.setRole(Role.USER);
 
         userRepository.save(user);
     }
