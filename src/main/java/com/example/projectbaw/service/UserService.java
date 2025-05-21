@@ -29,6 +29,10 @@ public class UserService {
             throw new IllegalArgumentException("User already exists");
         }
 
+        if(requestDto.getPassword().length() < 8){
+            throw new IllegalArgumentException("Password must be at least 8 characters long");
+        }
+
         User user = new User();
         user.setUsername(userMapper.toEntity(requestDto).getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(userMapper.toEntity(requestDto).getPassword()));
@@ -58,7 +62,7 @@ public class UserService {
         String username = (String) authentication.getPrincipal();
         User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
 
-        if(bCryptPasswordEncoder.matches(oldPassword, user.getPassword())){
+        if(newPassword.length() < 8 && bCryptPasswordEncoder.matches(oldPassword, user.getPassword())){
 
                 user.setPassword(bCryptPasswordEncoder.encode(newPassword));
                 userRepository.save(user);

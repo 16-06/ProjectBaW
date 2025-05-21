@@ -41,8 +41,8 @@ public class VoteOptionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        voteOptionService.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @RequestBody Long voteId) {
+        voteOptionService.deleteById(id,voteId);
         return ResponseEntity.ok().build();
     }
 

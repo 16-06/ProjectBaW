@@ -53,9 +53,9 @@ public class UserController {
         boolean result = userService.changePassword(requestDto.getPassword(),requestDto.getNewPassword());
 
         if(result)
-            return ResponseEntity.ok("success");
+            return ResponseEntity.ok("Successful password change");
         else
-            return ResponseEntity.badRequest().body("Nieprawidłowe dane");
+            return ResponseEntity.badRequest().body("Incorrect old password or new password ");
     }
 
 

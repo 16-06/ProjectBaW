@@ -52,14 +52,37 @@ public class VoteService {
     }
 
     public void deleteById(Long id) {
-        voteRepository.deleteById(id);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        Vote vote = voteRepository.findByIdAndUserId(id,user.getId());
+
+        if(vote != null){
+            voteRepository.deleteById(id);
+        }
+        else{
+            throw new RuntimeException("Vote not belongs to user");
+        }
+
+
     }
 
     public void updateCategory(Long voteId, String newCategory) {
-        voteRepository.findById(voteId).ifPresent(vote -> {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        Vote vote = voteRepository.findByIdAndUserId(voteId,user.getId());
+
+        if(vote!= null){
             vote.setCategory(newCategory);
             voteRepository.save(vote);
-        });
+
+        }
+        else{
+            throw new RuntimeException("Vote not belongs to user");
+        }
     }
 
     public void updateImage(Long voteId, byte[] newImage) {

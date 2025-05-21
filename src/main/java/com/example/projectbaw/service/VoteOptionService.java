@@ -5,10 +5,13 @@ import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.Vote;
 import com.example.projectbaw.model.VoteOption;
 import com.example.projectbaw.payload.VoteOptionDto;
+import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.VoteOptionRepository;
 import com.example.projectbaw.repository.VoteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +27,7 @@ public class VoteOptionService {
     private final VoteOptionRepository voteOptionRepository;
     private final VoteOptionMapper voteOptionMapper;
     private final VoteRepository voteRepository;
+    private final UserRepository userRepository;
 
     public List<VoteOptionDto.ResponseDto> getByVoteId(Long voteId) {
         return voteOptionRepository.findByVoteId(voteId)
@@ -59,8 +63,20 @@ public class VoteOptionService {
         return voteOptionMapper.toVoteOptionDto(voteOptionRepository.save(voteOption));
     }
 
-    public void deleteById(Long voteId) {
-        voteOptionRepository.deleteById(voteId);
+    public void deleteById(Long id,Long voteId) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        Vote vote = voteRepository.findByIdAndUserId(voteId,user.getId());
+
+        if(vote != null){
+            voteOptionRepository.deleteById(id);
+        }
+        else{
+            throw new RuntimeException("Vote not belongs to user");
+        }
+
     }
 
     public void uploadImage(Long voteId, MultipartFile file) throws IOException {
