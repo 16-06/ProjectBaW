@@ -6,6 +6,8 @@ import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.role.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,14 +52,16 @@ public class UserService {
     }
 
     @Transactional
-    public boolean changePassword(String username, String oldPassword, String newPassword){
+    public boolean changePassword(String oldPassword, String newPassword){
 
-        Optional<User> user = userRepository.findByUsername(username);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
 
-        if(user.isPresent() && bCryptPasswordEncoder.matches(oldPassword, user.get().getPassword())){
+        if(bCryptPasswordEncoder.matches(oldPassword, user.getPassword())){
 
-                user.get().setPassword(bCryptPasswordEncoder.encode(newPassword));
-                userRepository.save(user.get());
+                user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+                userRepository.save(user);
                 return true;
         }
         return false;

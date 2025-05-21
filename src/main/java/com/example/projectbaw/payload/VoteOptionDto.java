@@ -14,12 +14,16 @@ public class VoteOptionDto {
     public static class RequestDto {
         private String name;
         private byte[] imagedata;
+        private Long voteId;
 
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
 
         public byte[] getImagedata() { return imagedata; }
         public void setImagedata(byte[] imagedata) { this.imagedata = imagedata; }
+
+        public Long getVoteId() { return voteId; }
+        public void setVoteId(Long voteId) { this.voteId = voteId; }
     }
 
     public static class ResponseDto {

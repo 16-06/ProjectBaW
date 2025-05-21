@@ -7,11 +7,14 @@ import com.example.projectbaw.model.WhoVotedYet;
 import com.example.projectbaw.payload.WhoVotedYetDto;
 import com.example.projectbaw.service.WhoVotedYetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,11 +34,13 @@ public class WhoVotedYetController {
     }
 
     @GetMapping("/{voteId}")
-    public ResponseEntity<?> getById(@PathVariable Long voteId, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> getById(@PathVariable Long voteId) {
 
-        List<WhoVotedYet> entities  = whoVotedYetService.findByUserAndVoteId(user, voteId);
-        List<WhoVotedYetDto.ResponseDto> voteList = entities .stream().map(whoVotedYetMapper::toWhoVotedYetDto).collect(Collectors.toList());
-        return ResponseEntity.ok(voteList);
+        boolean hasVoted = whoVotedYetService.hasUserVoted(voteId);
+        return ResponseEntity.ok(new HashMap<String, Boolean>() {{
+            put("hasVoted", hasVoted);
+        }});
+
 
     }
 

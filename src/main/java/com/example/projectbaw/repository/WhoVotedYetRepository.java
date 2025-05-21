@@ -11,4 +11,7 @@ import java.util.List;
 public interface WhoVotedYetRepository extends JpaRepository<WhoVotedYet, Long> {
 
     List<WhoVotedYet> findByUserAndVoteId(User user, long voteId);
+    List<WhoVotedYet> findByVoteId(Long voteId);
+    boolean existsByUserIdAndVoteId(Long userid, Long voteId);
+
 }
