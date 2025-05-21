@@ -8,6 +8,7 @@ import com.example.projectbaw.service.UserService;
 import com.example.projectbaw.service.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,6 +63,7 @@ public class VoteController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteVote(@PathVariable Long id) {
 
+
         voteService.deleteById(id);
 
         return ResponseEntity.ok("Vote deleted");
@@ -69,9 +71,9 @@ public class VoteController {
     }
 
     @PutMapping("/category/{voteId}")
-    public ResponseEntity<String> updateVote(@PathVariable Long voteId, @RequestBody VoteDto.ResponseDto dto) {
+    public ResponseEntity<String> updateVote(@PathVariable Long voteId, @RequestBody String category) {
 
-        voteService.updateCategory(voteId,dto.getCategory());
+        voteService.updateCategory(voteId,category);
 
         return ResponseEntity.ok("Category updated");
     }
