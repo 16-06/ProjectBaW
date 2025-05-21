@@ -1,11 +1,16 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.Vote;
+import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.security.Security;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +19,7 @@ import java.util.Optional;
 public class VoteService {
 
     private final VoteRepository voteRepository;
+    private final UserRepository userRepository;
 
     public List<Vote> getByCategory(String category) {
 
@@ -36,6 +42,12 @@ public class VoteService {
     }
 
     public Vote save(Vote vote) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        vote.setUser(user);
+
         return voteRepository.save(vote);
     }
 

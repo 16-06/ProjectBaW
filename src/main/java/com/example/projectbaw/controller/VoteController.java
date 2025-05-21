@@ -24,8 +24,8 @@ public class VoteController {
     private final VoteService voteService;
     private final VoteMapper voteMapper;
 
-    @GetMapping
-    public ResponseEntity<List<VoteDto.ResponseDto>> getVotes(@RequestParam String category) {
+    @GetMapping("/")
+    public ResponseEntity<List<VoteDto.ResponseDto>> getVotes(@RequestBody String category) {
 
         List<VoteDto.ResponseDto> dtos = voteService.getByCategory(category)
                 .stream()
@@ -51,7 +51,7 @@ public class VoteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<VoteDto.ResponseDto> createVote(@RequestBody VoteDto.RequestDto requestDto) {
 
         Vote savedVote = voteService.save(voteMapper.toEntity(requestDto));

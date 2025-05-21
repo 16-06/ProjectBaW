@@ -3,8 +3,11 @@ package com.example.projectbaw.service;
 
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.WhoVotedYet;
+import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.WhoVotedYetRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,17 +17,27 @@ import java.util.List;
 public class WhoVotedYetService {
 
     private final WhoVotedYetRepository whoVotedYetRepository;
+    private final UserRepository userRepository;
 
     public WhoVotedYet save(WhoVotedYet whoVotedYet){
 
         return whoVotedYetRepository.save(whoVotedYet);
     }
 
-    public List<WhoVotedYet> findByUserAndVoteId(User user, Long voteId){
+    public List<WhoVotedYet> findByVoteId(Long voteId){
 
-        return whoVotedYetRepository.findByUserAndVoteId(user,voteId);
+        return whoVotedYetRepository.findByVoteId(voteId);
 
     }
 
+    public boolean hasUserVoted(Long voteId) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        Long userId = user.getId();
+
+        return whoVotedYetRepository.existsByUserIdAndVoteId(userId, voteId);
+    }
 
 }

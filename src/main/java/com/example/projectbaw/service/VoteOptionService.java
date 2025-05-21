@@ -1,10 +1,13 @@
 package com.example.projectbaw.service;
 
 import com.example.projectbaw.mapper.VoteOptionMapper;
+import com.example.projectbaw.model.User;
+import com.example.projectbaw.model.Vote;
 import com.example.projectbaw.model.VoteOption;
 import com.example.projectbaw.payload.VoteOptionDto;
 import com.example.projectbaw.repository.VoteOptionRepository;
 import com.example.projectbaw.repository.VoteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +23,7 @@ public class VoteOptionService {
 
     private final VoteOptionRepository voteOptionRepository;
     private final VoteOptionMapper voteOptionMapper;
+    private final VoteRepository voteRepository;
 
     public List<VoteOptionDto.ResponseDto> getByVoteId(Long voteId) {
         return voteOptionRepository.findByVoteId(voteId)
@@ -28,14 +32,21 @@ public class VoteOptionService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<VoteOptionDto.ResponseDto> getById(Long voteId) {
-        return voteOptionRepository.findById(voteId).map(voteOptionMapper::toVoteOptionDto);
+    public Optional<VoteOptionDto.ResponseDto> getById(Long Id) {
+        return voteOptionRepository.findById(Id).map(voteOptionMapper::toVoteOptionDto);
 
     }
 
     public VoteOptionDto.ResponseDto create(VoteOptionDto.RequestDto dto) {
 
-        VoteOption saved = voteOptionRepository.save(voteOptionMapper.toEntity(dto));
+        Vote vote = voteRepository.findById(dto.getVoteId()).orElseThrow(()-> new EntityNotFoundException("Vote not found"));
+
+        VoteOption saved = new VoteOption();
+
+        saved = voteOptionMapper.toEntity(dto);
+        saved.setVote(vote);
+
+        voteOptionRepository.save(saved);
 
         return voteOptionMapper.toVoteOptionDto(saved);
     }

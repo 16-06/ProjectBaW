@@ -48,9 +48,9 @@ public class UserController {
     }
 
     @PutMapping("/changepassword")
-    public ResponseEntity<?> changePassword(@RequestBody UserDto.RequestDto requestDto,@RequestBody String newPassword) {
+    public ResponseEntity<?> changePassword(@RequestBody UserDto.ChangePassDto requestDto) {
 
-        boolean result = userService.changePassword(requestDto.getUsername(),requestDto.getPassword(),newPassword);
+        boolean result = userService.changePassword(requestDto.getPassword(),requestDto.getNewPassword());
 
         if(result)
             return ResponseEntity.ok("success");
