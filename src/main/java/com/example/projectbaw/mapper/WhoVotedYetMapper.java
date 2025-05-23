@@ -17,8 +17,8 @@ public class WhoVotedYetMapper {
         }
         WhoVotedYetDto.ResponseDto responseDto = new WhoVotedYetDto.ResponseDto();
         responseDto.setId(whoVotedYet.getId());
-        responseDto.setUserId(whoVotedYet.getId());
-        responseDto.setVoteId(whoVotedYet.getId());
+        responseDto.setUserId(whoVotedYet.getUser().getId());
+        responseDto.setVoteId(whoVotedYet.getVote().getId());
         responseDto.setAlreadyVoted(whoVotedYet.isAlreadyVoted());
 
         return responseDto;
@@ -32,9 +32,9 @@ public class WhoVotedYetMapper {
         WhoVotedYet whoVotedYet = new WhoVotedYet();
         whoVotedYet.setAlreadyVoted(requestDto.isAlreadyVoted());
 
-        User user = new User();
-        user.setId(requestDto.getUserId());
-        whoVotedYet.setUser(user);
+      //  User user = new User();
+       // user.setId(requestDto.getUserId());
+       // whoVotedYet.setUser(user);
 
         Vote vote = new Vote();
         vote.setId(requestDto.getVoteId());

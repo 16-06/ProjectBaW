@@ -86,9 +86,20 @@ public class VoteService {
     }
 
     public void updateImage(Long voteId, byte[] newImage) {
-        voteRepository.findById(voteId).ifPresent(vote -> {
-            vote.setImage(newImage);
-            voteRepository.save(vote);
-        });
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        Vote vote = voteRepository.findByIdAndUserId(voteId,user.getId());
+
+        if(vote != null){
+            voteRepository.findById(voteId).ifPresent(v -> {
+                v.setImage(newImage);
+                voteRepository.save(v);
+            });
+        }
+        else{
+            throw new RuntimeException("Vote not belongs to user");
+        }
     }
 }

@@ -21,6 +21,12 @@ public class WhoVotedYetService {
 
     public WhoVotedYet save(WhoVotedYet whoVotedYet){
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+
+        whoVotedYet.setUser(user);
+
         return whoVotedYetRepository.save(whoVotedYet);
     }
 
