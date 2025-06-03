@@ -27,7 +27,7 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody UserDto.RequestDto request) {
 
         userService.registerUser(request);
-        return ResponseEntity.ok("success");
+        return ResponseEntity.ok("Successfully registered");
 
     }
 
@@ -39,7 +39,7 @@ public class UserController {
                     String token = jwtUtil.generateToken(user);
                     return ResponseEntity.ok(token);
                 })
-                .orElse(ResponseEntity.badRequest().body("nie udane logowanie"));
+                .orElse(ResponseEntity.badRequest().body("Invalid username or password"));
     }
 
     @GetMapping("/info/{id}")

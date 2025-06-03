@@ -43,16 +43,27 @@ public class VoteOptionService {
 
     public VoteOptionDto.ResponseDto create(VoteOptionDto.RequestDto dto) {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
         Vote vote = voteRepository.findById(dto.getVoteId()).orElseThrow(()-> new EntityNotFoundException("Vote not found"));
+        Vote voteUser = voteRepository.findByIdAndUserId(dto.getVoteId(),user.getId());
 
-        VoteOption saved = new VoteOption();
+        //VoteOption saved = new VoteOption();
 
-        saved = voteOptionMapper.toEntity(dto);
-        saved.setVote(vote);
+        if(voteUser != null) {
 
-        voteOptionRepository.save(saved);
+            VoteOption saved = voteOptionMapper.toEntity(dto);
+            saved.setVote(vote);
 
-        return voteOptionMapper.toVoteOptionDto(saved);
+            voteOptionRepository.save(saved);
+
+            return voteOptionMapper.toVoteOptionDto(saved);
+        }
+        else{
+            throw new EntityNotFoundException("Vote not belongs to user");
+        }
     }
 
     public VoteOptionDto.ResponseDto updateCount(VoteOptionDto.ResponseDto dto) {
@@ -80,10 +91,21 @@ public class VoteOptionService {
     }
 
     public void uploadImage(Long voteId, MultipartFile file) throws IOException {
-        VoteOption voteOption = voteOptionRepository.findById(voteId)
-                .orElseThrow(()->new RuntimeException("Vote option not found"));
 
-        voteOption.setImagedata(file.getBytes());
-        voteOptionRepository.save(voteOption);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        Vote vote = voteRepository.findByIdAndUserId(voteId,user.getId());
+
+        if(vote != null){
+            VoteOption voteOption = voteOptionRepository.findById(voteId)
+                    .orElseThrow(()->new RuntimeException("Vote option not found"));
+
+            voteOption.setImagedata(file.getBytes());
+            voteOptionRepository.save(voteOption);
+        }
+        else{
+            throw new RuntimeException("Vote not belongs to user");
+        }
     }
 }
