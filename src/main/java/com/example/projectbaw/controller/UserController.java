@@ -4,10 +4,16 @@ import com.example.projectbaw.config.JwtUtil;
 import com.example.projectbaw.mapper.UserMapper;
 import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -56,6 +62,22 @@ public class UserController {
             return ResponseEntity.ok("Successful password change");
         else
             return ResponseEntity.badRequest().body("Incorrect old password or new password ");
+    }
+
+    @GetMapping("/auth")
+    public ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request) {
+        String username = (String) request.getAttribute("username");
+        Long userId = (Long) request.getAttribute("UserId");
+
+        if (username == null || userId == null) {
+            return ResponseEntity.status(401).body("Unauthorized1");
+        }
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("id", userId);
+        userInfo.put("username", username);
+
+        return ResponseEntity.ok(userInfo);
     }
 
 

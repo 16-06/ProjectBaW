@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.security.Security;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +26,8 @@ public class VoteService {
         }
         return voteRepository.findAll();
     }
+
+    public List<Vote> getAllVotes() { return voteRepository.findAll(); }
 
     public List<Vote> getByUser(String user) {
         return voteRepository.findByUserUsername(user);
@@ -91,4 +91,5 @@ public class VoteService {
             voteRepository.save(vote);
         });
     }
+
 }
