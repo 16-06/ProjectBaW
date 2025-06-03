@@ -27,10 +27,13 @@ public class VoteMapper {
         responseDto.setName(vote.getName());
         responseDto.setImagedata(vote.getImage());
 
-        List<VoteOptionDto.ResponseDto> options = vote.getVoteOptions().stream()
-                .map(voteOptionMapper::toVoteOptionDto)
-                .collect(Collectors.toList());
-        responseDto.setOptions(options);
+
+        if(vote.getVoteOptions() != null){
+            List<VoteOptionDto.ResponseDto> options = vote.getVoteOptions().stream()
+                    .map(voteOptionMapper::toVoteOptionDto)
+                    .collect(Collectors.toList());
+            responseDto.setOptions(options);
+        }
 
         return responseDto;
     }

@@ -29,7 +29,7 @@ public class VoteOptionController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<VoteOptionDto.ResponseDto> create(@RequestBody VoteOptionDto.RequestDto dto) {
         return ResponseEntity.ok(voteOptionService.create(dto));
 

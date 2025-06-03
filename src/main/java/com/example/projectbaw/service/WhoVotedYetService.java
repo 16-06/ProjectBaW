@@ -21,6 +21,18 @@ public class WhoVotedYetService {
 
     public WhoVotedYet save(WhoVotedYet whoVotedYet){
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+
+        boolean existing = whoVotedYetRepository.existsByUserIdAndVoteId(user.getId(), whoVotedYet.getVote().getId());
+
+        if(existing){
+            throw new RuntimeException("User already voted");
+        }
+
+        whoVotedYet.setUser(user);
+
         return whoVotedYetRepository.save(whoVotedYet);
     }
 
