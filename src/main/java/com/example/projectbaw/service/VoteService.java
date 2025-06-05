@@ -47,6 +47,7 @@ public class VoteService {
         String username = (String) authentication.getPrincipal();
         User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
         vote.setUser(user);
+        vote.setAuthor(user.getUsername());
 
         return voteRepository.save(vote);
     }
