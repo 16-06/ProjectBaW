@@ -47,8 +47,10 @@ public class VoteOptionController {
     }
 
     @PutMapping("/upload/{id}")
-    public ResponseEntity<String> upload(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
-        voteOptionService.uploadImage(id,file);
+    public ResponseEntity<String> upload(@PathVariable Long id, @RequestParam("photo") MultipartFile file) throws IOException {
+
+        voteOptionService.uploadImage(id,file.getBytes());
+
         return ResponseEntity.ok("Picture added");
     }
 }

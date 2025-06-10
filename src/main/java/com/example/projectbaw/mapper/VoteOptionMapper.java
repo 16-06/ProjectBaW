@@ -19,6 +19,7 @@ public class VoteOptionMapper {
         responseDto.setCount(voteOption.getCount());
         responseDto.setName(voteOption.getName());
         responseDto.setImagedata(voteOption.getImagedata());
+        responseDto.setVoteId(voteOption.getVote().getId());
 
         return responseDto;
     }

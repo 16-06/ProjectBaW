@@ -3,8 +3,11 @@ package com.example.projectbaw.controller;
 
 import com.example.projectbaw.mapper.WhoVotedYetMapper;
 import com.example.projectbaw.model.User;
+import com.example.projectbaw.model.VoteOption;
 import com.example.projectbaw.model.WhoVotedYet;
 import com.example.projectbaw.payload.WhoVotedYetDto;
+import com.example.projectbaw.service.UserService;
+import com.example.projectbaw.service.VoteOptionService;
 import com.example.projectbaw.service.WhoVotedYetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,7 @@ public class WhoVotedYetController {
 
     private final WhoVotedYetService whoVotedYetService;
     private final WhoVotedYetMapper whoVotedYetMapper;
+    private final VoteOptionService voteOptionService;
 
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody WhoVotedYetDto.RequestDto requestDto) {
