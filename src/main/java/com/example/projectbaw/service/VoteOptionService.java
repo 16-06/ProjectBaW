@@ -90,18 +90,22 @@ public class VoteOptionService {
 
     }
 
-    public void uploadImage(Long voteId, MultipartFile file) throws IOException {
+    public void uploadImage(Long optionId, byte[] newImage) throws IOException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
-        Vote vote = voteRepository.findByIdAndUserId(voteId,user.getId());
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        VoteOption voteOption = voteOptionRepository.findById(optionId)
+                .orElseThrow(()->new RuntimeException("Vote option not found"));
+
+        Vote vote = voteRepository.findByIdAndUserId(voteOption.getVote().getId(),user.getId());
 
         if(vote != null){
-            VoteOption voteOption = voteOptionRepository.findById(voteId)
-                    .orElseThrow(()->new RuntimeException("Vote option not found"));
 
-            voteOption.setImagedata(file.getBytes());
+            voteOption.setImagedata(newImage);
             voteOptionRepository.save(voteOption);
         }
         else{

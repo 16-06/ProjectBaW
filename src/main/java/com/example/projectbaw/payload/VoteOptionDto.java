@@ -31,6 +31,7 @@ public class VoteOptionDto {
         private String name;
         private int count;
         private byte[] imagedata;
+        private Long voteId;
 
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
@@ -43,6 +44,9 @@ public class VoteOptionDto {
 
         public byte[] getImagedata() { return imagedata; }
         public void setImagedata(byte[] imagedata) { this.imagedata = imagedata; }
+
+        public Long getVoteId() {return voteId;}
+        public void setVoteId(Long voteId) {this.voteId = voteId;}
     }
 }
 

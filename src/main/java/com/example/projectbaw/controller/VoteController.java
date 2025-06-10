@@ -44,7 +44,7 @@ public class VoteController {
         return ResponseEntity.ok(dtos);
     }
 
-
+    
     @GetMapping("/user/{id}")
     public ResponseEntity<List<VoteDto.ResponseDto>> getVoteById(@PathVariable Long id) {
         List<VoteDto.ResponseDto> dtos = voteService.getByUserId(id).stream()
