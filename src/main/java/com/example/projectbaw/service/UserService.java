@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -69,6 +70,21 @@ public class UserService {
                 return true;
         }
         return false;
+    }
+
+    public boolean isAdmin() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+
+        return user.getRole() == Role.ADMIN;
+
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+
     }
 
 }
