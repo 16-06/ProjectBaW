@@ -8,12 +8,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class UserController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
 
     @PostMapping("")
     public ResponseEntity<?> registerUser(@RequestBody UserDto.RequestDto request) {
@@ -78,6 +82,24 @@ public class UserController {
         userInfo.put("username", username);
 
         return ResponseEntity.ok(userInfo);
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<?> isAdmin() {
+
+        boolean isAdmin = userService.isAdmin();
+
+        List<UserDto.ResponseDto> users = userService.getAllUsers()
+                .stream()
+                .map(userMapper::toUserDto)
+                .toList();
+
+
+        if (isAdmin) {
+            return ResponseEntity.ok(users);
+        } else {
+            return  ResponseEntity.status(401).body("Unauthorized");
+        }
     }
 
 

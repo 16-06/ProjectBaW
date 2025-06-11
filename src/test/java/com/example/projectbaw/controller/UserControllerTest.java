@@ -1,6 +1,7 @@
 package com.example.projectbaw.controller;
 
 import com.example.projectbaw.config.JwtUtil;
+import com.example.projectbaw.mapper.UserMapper;
 import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,11 +33,14 @@ public class UserControllerTest {
     private JwtUtil jwtUtil;
 
     @MockBean
+    private UserMapper userMapper;
+
+    @MockBean
     private HttpServletRequest httpServletRequest;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService, jwtUtil)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService, jwtUtil,userMapper)).build();
     }
 
     // Test dla POST /api/users
