@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserService userService;
-    private final JwtUtil jwtUtil;
-    private final UserMapper userMapper;
+    private final UserService   userService;
+    private final JwtUtil       jwtUtil;
+    private final UserMapper    userMapper;
 
     @PostMapping("")
     public ResponseEntity<?> registerUser(@RequestBody UserDto.RequestDto request) {

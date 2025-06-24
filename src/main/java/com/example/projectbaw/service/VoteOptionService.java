@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class VoteOptionService {
 
-    private final VoteOptionRepository voteOptionRepository;
-    private final VoteOptionMapper voteOptionMapper;
-    private final VoteRepository voteRepository;
-    private final UserRepository userRepository;
+    private final VoteOptionRepository  voteOptionRepository;
+    private final VoteOptionMapper      voteOptionMapper;
+    private final VoteRepository        voteRepository;
+    private final UserRepository        userRepository;
 
     public List<VoteOptionDto.ResponseDto> getByVoteId(Long voteId) {
         return voteOptionRepository.findByVoteId(voteId)
