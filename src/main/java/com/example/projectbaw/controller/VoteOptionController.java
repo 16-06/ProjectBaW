@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VoteOptionController {
 
-    private final VoteOptionService voteOptionService;
+    private final VoteOptionService     voteOptionService;
 
     @GetMapping("/{voteId}")
     public ResponseEntity<List<VoteOptionDto.ResponseDto>> getByVoteId(@PathVariable Long voteId) {

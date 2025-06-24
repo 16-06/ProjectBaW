@@ -19,13 +19,13 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
-    /*
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/api")
+                        auth -> auth.requestMatchers("/api/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
@@ -35,7 +35,7 @@ public class SecurityConfig {
 
         return httpSecurity.build();
     }
-    */
+    /*
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
-
+    */
 
     @Bean
     public BCryptPasswordEncoder BCryptpasswordEncoder() {

@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/vote")
 public class VoteController {
 
-    private final VoteService voteService;
-    private final VoteMapper voteMapper;
+    private final VoteService   voteService;
+    private final VoteMapper    voteMapper;
 
     @GetMapping("")
     public ResponseEntity<List<VoteDto.ResponseDto>> getAllVotes() {

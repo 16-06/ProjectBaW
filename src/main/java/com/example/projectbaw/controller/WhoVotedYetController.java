@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/whovoted")
 public class WhoVotedYetController {
 
-    private final WhoVotedYetService whoVotedYetService;
-    private final WhoVotedYetMapper whoVotedYetMapper;
-    private final VoteOptionService voteOptionService;
+    private final WhoVotedYetService    whoVotedYetService;
+    private final WhoVotedYetMapper     whoVotedYetMapper;
+    private final VoteOptionService     voteOptionService;
 
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody WhoVotedYetDto.RequestDto requestDto) {

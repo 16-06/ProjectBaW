@@ -16,8 +16,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class VoteService {
 
-    private final VoteRepository voteRepository;
-    private final UserRepository userRepository;
+    private final VoteRepository    voteRepository;
+    private final UserRepository    userRepository;
 
     public List<Vote> getByCategory(String category) {
 

@@ -16,8 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WhoVotedYetService {
 
-    private final WhoVotedYetRepository whoVotedYetRepository;
-    private final UserRepository userRepository;
+    private final WhoVotedYetRepository     whoVotedYetRepository;
+    private final UserRepository            userRepository;
 
     public WhoVotedYet save(WhoVotedYet whoVotedYet){
 

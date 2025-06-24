@@ -19,9 +19,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository        userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final UserMapper userMapper;
+    private final UserMapper            userMapper;
 
     @Transactional
     public void registerUser(UserDto.RequestDto requestDto) {
