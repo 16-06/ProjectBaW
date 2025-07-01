@@ -89,6 +89,7 @@ public class UserController {
 
         boolean isAdmin = userService.isAdmin();
 
+
         List<UserDto.ResponseDto> users = userService.getAllUsers()
                 .stream()
                 .map(userMapper::toUserDto)
@@ -98,7 +99,7 @@ public class UserController {
         if (isAdmin) {
             return ResponseEntity.ok(users);
         } else {
-            return  ResponseEntity.status(401).body("Unauthorized");
+            return  ResponseEntity.status(401).body("Unauthorized, not admin user access");
         }
     }
 
