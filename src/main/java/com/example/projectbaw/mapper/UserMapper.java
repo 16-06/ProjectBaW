@@ -30,5 +30,18 @@ public class UserMapper {
         user.setPassword(requestDto.getPassword());
         return user;
     }
+
+    public User toRegister(UserDto.RegisterDto requestDto) {
+        if(requestDto == null) {
+            return null;
+        }
+
+        User user = new User();
+        user.setUsername(requestDto.getUsername());
+        user.setPassword(requestDto.getPassword());
+        user.setEmail(requestDto.getEmail());
+
+        return user;
+    }
 }
 
