@@ -19,7 +19,11 @@ public class User {
     private long id;
 
     private String username;
+    private String email;
     private String password;
+    private String activationToken;
+    private String resetPasswordToken;
+    private boolean enabledAccount;
 
     @Enumerated(EnumType.STRING)
     private Role role;

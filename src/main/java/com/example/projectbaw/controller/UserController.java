@@ -2,20 +2,19 @@ package com.example.projectbaw.controller;
 
 import com.example.projectbaw.config.JwtUtil;
 import com.example.projectbaw.mapper.UserMapper;
+import com.example.projectbaw.model.User;
 import com.example.projectbaw.payload.UserDto;
+import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -23,12 +22,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserService   userService;
-    private final JwtUtil       jwtUtil;
-    private final UserMapper    userMapper;
+    private final UserService       userService;
+    private final UserRepository    userRepository;
+    private final JwtUtil           jwtUtil;
+    private final UserMapper        userMapper;
 
     @PostMapping("")
-    public ResponseEntity<?> registerUser(@RequestBody UserDto.RequestDto request) {
+    public ResponseEntity<?> registerUser(@RequestBody UserDto.RegisterDto request) {
 
         userService.registerUser(request);
         return ResponseEntity.ok("Successfully registered");
@@ -43,7 +43,7 @@ public class UserController {
                     String token = jwtUtil.generateToken(user);
                     return ResponseEntity.ok(token);
                 })
-                .orElse(ResponseEntity.badRequest().body("Invalid username or password"));
+                .orElse(ResponseEntity.badRequest().body("Invalid credentials or account not activated"));
     }
 
     @GetMapping("/info/{id}")
@@ -101,6 +101,44 @@ public class UserController {
         } else {
             return  ResponseEntity.status(401).body("Unauthorized, not admin user access");
         }
+    }
+
+    @GetMapping("/confirm")
+    public ResponseEntity<String> confirmAccount(@RequestParam String token) {
+
+        Optional<User> user = userRepository.findByActivationToken(token);
+
+        if(user.isEmpty()){
+            return ResponseEntity.badRequest().body("Invalid token");
+        }
+
+        User confirmedUser = user.get();
+        confirmedUser.setEnabledAccount(true);
+        confirmedUser.setActivationToken(null);
+        userRepository.save(confirmedUser);
+
+        return ResponseEntity.ok("Account successfully activated");
+
+    }
+
+    @PostMapping("/password-reset-request")
+    public ResponseEntity<?> passwordResetRequestByEmail(@RequestBody UserDto.passwordResetRequestDto requestDto) {
+
+            userService.PasswordResetByEmail(requestDto.getEmail());
+            return ResponseEntity.ok("Password reset email sent");
+
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody UserDto.ResetPasswordDto resetPasswordDto) {
+
+        boolean result = userService.resetPassword(resetPasswordDto.getResetPasswordToken(), resetPasswordDto.getNewPassword());
+
+        if(result)
+            return ResponseEntity.ok("Password successfully reset");
+        else
+            return ResponseEntity.badRequest().body("Invalid token or password too short");
+
     }
 
 
