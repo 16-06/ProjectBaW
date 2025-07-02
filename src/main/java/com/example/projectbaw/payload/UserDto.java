@@ -76,4 +76,11 @@ public class UserDto {
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
     }
+
+    public static class getProfileDto {
+        private String username;
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+
+    }
 }

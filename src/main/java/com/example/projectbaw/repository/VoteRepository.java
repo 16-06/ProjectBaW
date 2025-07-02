@@ -9,14 +9,11 @@ import java.util.List;
 
 @Repository
 public interface VoteRepository extends JpaRepository<Vote,Long> {
-    List<Vote> findByCategory(String category);
 
-    List<Vote> findByUser(User user);
-
-    List<Vote> findByUserUsername(String userUsername);
-
-    List<Vote> findByUserId(long userId);
-
-    Vote findByIdAndUserId(long voteId, long userId);
+    List<Vote>  findByCategory(String category);
+    List<Vote>  findByUser(User user);
+    List<Vote>  findByUserUsername(String userUsername);
+    List<Vote>  findByUserId(long userId);
+    Vote        findByIdAndUserId(long voteId, long userId);
 
 }

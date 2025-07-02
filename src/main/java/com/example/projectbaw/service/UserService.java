@@ -2,12 +2,12 @@ package com.example.projectbaw.service;
 
 import com.example.projectbaw.mapper.UserMapper;
 import com.example.projectbaw.model.User;
+import com.example.projectbaw.model.UserProfile;
 import com.example.projectbaw.payload.UserDto;
+import com.example.projectbaw.repository.UserProfileRepository;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.role.Role;
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,11 +26,12 @@ public class UserService {
     private final BCryptPasswordEncoder     bCryptPasswordEncoder;
     private final UserMapper                userMapper;
     private final EmailConfirmationService  emailConfirmationService;
+    private final UserProfileRepository     userProfileRepository;
 
     @Transactional
     public void registerUser(UserDto.RegisterDto requestDto) {
 
-        if(userRepository.existsByUsername(requestDto.getUsername())){
+        if(userRepository.existsByUsername(requestDto.getUsername()) || userRepository.existsByEmail(requestDto.getEmail())){
             throw new IllegalArgumentException("User already exists");
         }
 
@@ -39,6 +40,7 @@ public class UserService {
         }
 
         User user = new User();
+
         user.setUsername(userMapper.toRegister(requestDto).getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(userMapper.toRegister(requestDto).getPassword()));
         user.setEmail(userMapper.toRegister(requestDto).getEmail());
@@ -48,7 +50,12 @@ public class UserService {
         String token = UUID.randomUUID().toString();
         user.setActivationToken(token);
 
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(user);
+
         userRepository.save(user);
+        userProfileRepository.save(userProfile);
+
         emailConfirmationService.sendConfirmationEmail(user.getEmail(), token);
     }
 
