@@ -1,12 +1,8 @@
 package com.example.projectbaw.controller;
 
-
-import com.example.projectbaw.mapper.UserProfileMapper;
-import com.example.projectbaw.model.UserProfile;
 import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.payload.UserProfileDto;
 import com.example.projectbaw.service.UserProfileService;
-import com.example.projectbaw.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
-    private final UserService userService;
 
     @PutMapping("/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserProfileDto.RequestDto request) {

@@ -1,21 +1,15 @@
 package com.example.projectbaw.controller;
 
-import com.example.projectbaw.config.JwtUtil;
-import com.example.projectbaw.mapper.UserMapper;
-import com.example.projectbaw.model.User;
 import com.example.projectbaw.payload.UserDto;
-import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -23,9 +17,6 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService       userService;
-    private final UserRepository    userRepository;
-    private final JwtUtil           jwtUtil;
-    private final UserMapper        userMapper;
 
     @PostMapping("")
     public ResponseEntity<?> registerUser(@RequestBody UserDto.RegisterDto request) {
@@ -39,22 +30,16 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody UserDto.RequestDto requestDto) {
 
         return userService.login(requestDto.getUsername(), requestDto.getPassword())
-                .map(user -> {
-                    String token = jwtUtil.generateToken(user);
-                    return ResponseEntity.ok(token);
-                })
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().body("Invalid credentials or account not activated"));
     }
 
     @GetMapping("/info/{id}")
     public ResponseEntity<?> getBasicInfo(@PathVariable Long id) {
 
-        return userService.getById(id).map(user -> {
-
-            UserDto.ResponseDto responseDto = new UserMapper().toUserDto(user);
-            return ResponseEntity.ok(responseDto);
-
-        }).orElse(ResponseEntity.notFound().build());
+        return userService.getById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/changepassword")
@@ -70,16 +55,12 @@ public class UserController {
 
     @GetMapping("/auth")
     public ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request) {
-        String username = (String) request.getAttribute("username");
-        Long userId = (Long) request.getAttribute("UserId");
 
-        if (username == null || userId == null) {
-            return ResponseEntity.status(401).body("Unauthorized1");
+        Map<String, Object> userInfo = userService.getAuthenticatedUserInfo(request);
+
+        if (userInfo == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
         }
-
-        Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("id", userId);
-        userInfo.put("username", username);
 
         return ResponseEntity.ok(userInfo);
     }
@@ -87,35 +68,20 @@ public class UserController {
     @GetMapping("/check")
     public ResponseEntity<?> isAdmin() {
 
-        boolean isAdmin = userService.isAdmin();
+        List<UserDto.ResponseDto> users = userService.isAdmin();
 
+        return ResponseEntity.ok(users);
 
-        List<UserDto.ResponseDto> users = userService.getAllUsers()
-                .stream()
-                .map(userMapper::toUserDto)
-                .toList();
-
-
-        if (isAdmin) {
-            return ResponseEntity.ok(users);
-        } else {
-            return  ResponseEntity.status(401).body("Unauthorized, not admin user access");
-        }
     }
 
     @GetMapping("/confirm")
     public ResponseEntity<String> confirmAccount(@RequestParam String token) {
 
-        Optional<User> user = userRepository.findByActivationToken(token);
+        boolean result = userService.activateAccount(token);
 
-        if(user.isEmpty()){
+        if(!result){
             return ResponseEntity.badRequest().body("Invalid token");
         }
-
-        User confirmedUser = user.get();
-        confirmedUser.setEnabledAccount(true);
-        confirmedUser.setActivationToken(null);
-        userRepository.save(confirmedUser);
 
         return ResponseEntity.ok("Account successfully activated");
 
