@@ -1,5 +1,6 @@
 package com.example.projectbaw.service;
 
+import com.example.projectbaw.config.JwtUtil;
 import com.example.projectbaw.mapper.UserMapper;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.UserProfile;
@@ -7,16 +8,16 @@ import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.repository.UserProfileRepository;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.role.Role;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class UserService {
     private final UserMapper                userMapper;
     private final EmailConfirmationService  emailConfirmationService;
     private final UserProfileRepository     userProfileRepository;
+    private final JwtUtil                   jwtUtil;
 
     @Transactional
     public void registerUser(UserDto.RegisterDto requestDto) {
@@ -59,18 +61,19 @@ public class UserService {
         emailConfirmationService.sendConfirmationEmail(user.getEmail(), token);
     }
 
-    public Optional<User> login(String username, String password){
+    public Optional<String> login(String username, String password){
 
-        Optional<User> user = userRepository.findByUsername(username);
-        if(user.isPresent() && user.get().isEnabledAccount() && bCryptPasswordEncoder.matches(password, user.get().getPassword())){
-            return user;
-        }
-        return Optional.empty();
+        return userRepository.findByUsername(username)
+                .filter(user -> user.isEnabledAccount() && bCryptPasswordEncoder.matches(password, user.getPassword()))
+                .map(user -> {
+                    String token = jwtUtil.generateToken(user);
+                    return token;
+                });
     }
 
-    public Optional<User> getById(Long id){
+    public Optional<UserDto.ResponseDto> getById(Long id){
 
-        return userRepository.findById(id);
+        return userRepository.findById(id).map(userMapper::toUserDto);
     }
 
     @Transactional
@@ -89,20 +92,55 @@ public class UserService {
         return false;
     }
 
-    public boolean isAdmin() {
+    public boolean activateAccount(String token) {
+
+        Optional<User> user = userRepository.findByActivationToken(token);
+
+        if (user.isEmpty() || user.get().isEnabledAccount()) {
+            return false;
+        }
+
+        User confirmedUser = user.get();
+        confirmedUser.setEnabledAccount(true);
+        confirmedUser.setActivationToken(null);
+        userRepository.save(confirmedUser);
+
+        return true;
+    }
+
+    public List<UserDto.ResponseDto> isAdmin() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (String) authentication.getPrincipal();
         User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
 
-        return user.getRole() == Role.ADMIN;
+        if(user.getRole() != Role.ADMIN ){
+            throw new AccessDeniedException("Access denied");
+        }
+
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toUserDto)
+                .toList();
 
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Map<String, Object> getAuthenticatedUserInfo(HttpServletRequest request){
 
+        String username = (String) request.getAttribute("username");
+        Long userId = (Long) request.getAttribute("UserId");
+
+        if (username == null || userId == null) {
+            return null;
+        }
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("id", userId);
+        userInfo.put("username", username);
+
+        return userInfo;
     }
+
 
     public void PasswordResetByEmail(String email) {
         User user = userRepository.findByEmail(email)
