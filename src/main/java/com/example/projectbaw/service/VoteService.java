@@ -1,8 +1,10 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.mapper.VoteMapper;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.Vote;
+import com.example.projectbaw.payload.VoteDto;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -18,38 +22,64 @@ public class VoteService {
 
     private final VoteRepository    voteRepository;
     private final UserRepository    userRepository;
+    private final VoteMapper        voteMapper;
 
-    public List<Vote> getByCategory(String category) {
+    public List<VoteDto.ResponseDto> getByCategory(String category) {
+
+        List<Vote> votes;
 
         if (category != null && !category.isEmpty()) {
-            return voteRepository.findByCategory(category);
+            votes =  voteRepository.findByCategory(category);
         }
-        return voteRepository.findAll();
+        else {
+            votes = voteRepository.findAll();
+        }
+
+        return votes.stream()
+                .map(voteMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<Vote> getAllVotes() { return voteRepository.findAll(); }
+    public List<VoteDto.ResponseDto> getAllVotes() {
+
+        return voteRepository.findAll()
+                .stream()
+                .map(voteMapper::toResponse)
+                .collect(Collectors.toList());
+
+    }
 
     public List<Vote> getByUser(String user) {
         return voteRepository.findByUserUsername(user);
     }
 
-    public List<Vote> getByUserId(Long id) {
-        return voteRepository.findByUserId(id);
+    public List<VoteDto.ResponseDto> getByUserId(Long id) {
+        return voteRepository.findByUserId(id)
+                .stream()
+                .map(voteMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Vote> getById(Long id) {
-        return voteRepository.findById(id);
+    public Optional<VoteDto.ResponseDto> getByVoteId(Long id) {
+
+        return voteRepository.findById(id)
+                .map(voteMapper::toResponse);
     }
 
-    public Vote save(Vote vote) {
+    public VoteDto.ResponseDto createVote(VoteDto.RequestDto requestDto) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        Vote vote = voteMapper.toEntity(requestDto);
         vote.setUser(user);
         vote.setAuthor(user.getUsername());
 
-        return voteRepository.save(vote);
+        Vote savedVote = voteRepository.save(vote);
+
+        return voteMapper.toResponse(savedVote);
     }
 
     public void deleteById(Long id) {

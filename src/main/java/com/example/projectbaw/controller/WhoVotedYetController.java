@@ -23,24 +23,24 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/whovoted")
+@RequestMapping("/api/whoVoted")
 public class WhoVotedYetController {
 
     private final WhoVotedYetService    whoVotedYetService;
-    private final WhoVotedYetMapper     whoVotedYetMapper;
-    private final VoteOptionService     voteOptionService;
 
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody WhoVotedYetDto.RequestDto requestDto) {
 
-        WhoVotedYet create = whoVotedYetService.save(whoVotedYetMapper.toEntity(requestDto));
-        return ResponseEntity.ok(whoVotedYetMapper.toWhoVotedYetDto(create));
+        WhoVotedYetDto.ResponseDto responseDto = whoVotedYetService.create(requestDto);
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/{voteId}")
     public ResponseEntity<?> getById(@PathVariable Long voteId) {
 
         boolean hasVoted = whoVotedYetService.hasUserVoted(voteId);
+
         return ResponseEntity.ok(new HashMap<String, Boolean>() {{
             put("hasVoted", hasVoted);
         }});
