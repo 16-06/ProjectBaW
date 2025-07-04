@@ -1,8 +1,5 @@
 package com.example.projectbaw.controller;
 
-
-import com.example.projectbaw.mapper.VoteMapper;
-import com.example.projectbaw.model.Vote;
 import com.example.projectbaw.payload.VoteDto;
 import com.example.projectbaw.service.VoteService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,53 +16,46 @@ import java.util.stream.Collectors;
 public class VoteController {
 
     private final VoteService   voteService;
-    private final VoteMapper    voteMapper;
 
     @GetMapping("")
     public ResponseEntity<List<VoteDto.ResponseDto>> getAllVotes() {
 
-        List<VoteDto.ResponseDto> dtos = voteService.getAllVotes()
-                .stream()
-                .map(voteMapper::toResponse)
-                .collect(Collectors.toList());
+        List<VoteDto.ResponseDto> votes = voteService.getAllVotes();
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(votes);
     }
 
-    @GetMapping("/caterogy")
-    public ResponseEntity<List<VoteDto.ResponseDto>> getVotes(@RequestBody String category) {
+    @GetMapping("/category")
+    public ResponseEntity<List<VoteDto.ResponseDto>> getVotesByCategory(@RequestParam String category) {
 
-        List<VoteDto.ResponseDto> dtos = voteService.getByCategory(category)
-                .stream()
-                .map(voteMapper::toResponse)
-                .collect(Collectors.toList());
+        List<VoteDto.ResponseDto> votes = voteService.getByCategory(category);
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(votes);
     }
 
     
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<VoteDto.ResponseDto>> getVoteById(@PathVariable Long id) {
-        List<VoteDto.ResponseDto> dtos = voteService.getByUserId(id).stream()
-                .map(voteMapper::toResponse)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<VoteDto.ResponseDto>> getVoteByUserId(@PathVariable Long id) {
 
-        return ResponseEntity.ok(dtos);
+        List<VoteDto.ResponseDto> vote = voteService.getByUserId(id);
+
+        return ResponseEntity.ok(vote);
     }
 
     @GetMapping("/byId/{id}")
-    public ResponseEntity<VoteDto.ResponseDto> getById(@PathVariable Long id) {
-        return voteService.getById(id)
-                .map(vote -> ResponseEntity.ok(voteMapper.toResponse(vote)))
+    public ResponseEntity<VoteDto.ResponseDto> getByVoteId(@PathVariable Long id) {
+
+        return voteService.getByVoteId(id)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("")
     public ResponseEntity<VoteDto.ResponseDto> createVote(@RequestBody VoteDto.RequestDto requestDto) {
 
-        Vote savedVote = voteService.save(voteMapper.toEntity(requestDto));
+        VoteDto.ResponseDto responseDto = voteService.createVote(requestDto);
 
-        return ResponseEntity.ok(voteMapper.toResponse(savedVote));
+        return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/{id}")

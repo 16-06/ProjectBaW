@@ -1,8 +1,10 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.mapper.WhoVotedYetMapper;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.WhoVotedYet;
+import com.example.projectbaw.payload.WhoVotedYetDto;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.WhoVotedYetRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,22 +20,28 @@ public class WhoVotedYetService {
 
     private final WhoVotedYetRepository     whoVotedYetRepository;
     private final UserRepository            userRepository;
+    private final WhoVotedYetMapper         whoVotedYetMapper;
 
-    public WhoVotedYet save(WhoVotedYet whoVotedYet){
+    public WhoVotedYetDto.ResponseDto create(WhoVotedYetDto.RequestDto requestDto){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(()-> new RuntimeException("User not found"));
 
-        boolean existing = whoVotedYetRepository.existsByUserIdAndVoteId(user.getId(), whoVotedYet.getVote().getId());
+        WhoVotedYet whoVotedYet = whoVotedYetMapper.toEntity(requestDto);
 
-        if(existing){
+        boolean alreadyVoted = whoVotedYetRepository.existsByUserIdAndVoteId(user.getId(), whoVotedYet.getVote().getId());
+
+        if(alreadyVoted){
             throw new RuntimeException("User already voted");
         }
 
         whoVotedYet.setUser(user);
 
-        return whoVotedYetRepository.save(whoVotedYet);
+        WhoVotedYet saved = whoVotedYetRepository.save(whoVotedYet);
+
+        return whoVotedYetMapper.toWhoVotedYetDto(saved);
     }
 
     public List<WhoVotedYet> findByVoteId(Long voteId){

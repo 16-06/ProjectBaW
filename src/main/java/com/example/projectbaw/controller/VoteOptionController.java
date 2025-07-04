@@ -22,7 +22,7 @@ public class VoteOptionController {
         return ResponseEntity.ok(voteOptionService.getByVoteId(voteId));
     }
 
-    @GetMapping("/byoptionId/{optionId}")
+    @GetMapping("/byOptionId/{optionId}")
     public ResponseEntity<VoteOptionDto.ResponseDto> getByOptionId(@PathVariable Long optionId) {
         return voteOptionService.getById(optionId)
                 .map(ResponseEntity::ok)
