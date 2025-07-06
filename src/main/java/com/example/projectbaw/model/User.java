@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -23,7 +25,10 @@ public class User {
     private String password;
     private String activationToken;
     private String resetPasswordToken;
+    private String TwoFactorCode;
     private boolean enabledAccount;
+    private boolean twoFactorEnabled;
+    LocalDateTime CodeExpiryTime;
 
     @Enumerated(EnumType.STRING)
     private Role role;

@@ -1,25 +1,16 @@
 package com.example.projectbaw.controller;
 
 
-import com.example.projectbaw.mapper.WhoVotedYetMapper;
-import com.example.projectbaw.model.User;
-import com.example.projectbaw.model.VoteOption;
-import com.example.projectbaw.model.WhoVotedYet;
+import com.example.projectbaw.payload.UserProfileDto;
 import com.example.projectbaw.payload.WhoVotedYetDto;
-import com.example.projectbaw.service.UserService;
-import com.example.projectbaw.service.VoteOptionService;
 import com.example.projectbaw.service.WhoVotedYetService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -45,6 +36,12 @@ public class WhoVotedYetController {
             put("hasVoted", hasVoted);
         }});
 
+    }
+
+    @GetMapping("/voters/{voteId}")
+    public ResponseEntity<List<UserProfileDto.ResponseDto>> getVotersProfiles(@PathVariable Long voteId) {
+
+        return ResponseEntity.ok(whoVotedYetService.getUserProfileWhoVoted(voteId));
 
     }
 

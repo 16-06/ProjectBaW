@@ -47,5 +47,25 @@ public class UserProfileService {
         return userProfileMapper.toDto(profile);
     }
 
+    public void uploadImage(byte[] imageData) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        UserProfile userProfile = userProfileRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("User profile not found"));
+
+        if(userProfile != null){
+            userProfile.setAvatarImage(imageData);
+            userProfileRepository.save(userProfile);
+        }
+        else{
+            throw new RuntimeException("Vote not belongs to user");
+        }
+    }
+
 }
 

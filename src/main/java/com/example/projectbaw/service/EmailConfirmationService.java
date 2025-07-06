@@ -38,4 +38,19 @@ public class EmailConfirmationService {
 
         mailSender.send(message);
     }
+
+
+    public void sendTwoFactorCode(String email, String code) {
+
+        String subject = "2FA Code";
+        String link = "http://localhost:3000/2fa/verify?token=" + code;
+        String body = "Click this link to complete login:" + link + " Link expires in 5 minutes.";
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject(subject);
+        message.setText(body);
+
+        mailSender.send(message);
+    }
 }
