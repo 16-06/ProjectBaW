@@ -4,6 +4,7 @@ import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +28,35 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDto.RequestDto requestDto) {
+    public ResponseEntity<?> loginUser(@RequestBody UserDto.RequestDto requestDto) {
 
-        return userService.login(requestDto.getUsername(), requestDto.getPassword())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.badRequest().body("Invalid credentials or account not activated"));
+        if(!userService.isAccountEnabled(requestDto.getUsername())){
+            return ResponseEntity.badRequest().body("Account not activated or does not exist");
+        }
+
+        Optional<String> token =  userService.login(requestDto.getUsername(), requestDto.getPassword());
+
+        if(token.isPresent()) {
+            return token
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.badRequest().body("Invalid credentials or account not activated"));
+        }
+
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Two-factor authentication code sent");
+    }
+
+    @PostMapping("/login/2fa")
+    public ResponseEntity<?> login(@RequestBody UserDto.TwoFactorDto dto) {
+
+        String verified = userService.verifyTwoFactorCode(dto.getUsername(), dto.getCode());
+
+        if (verified != null) {
+            return ResponseEntity.ok(verified);
+        } else {
+            return ResponseEntity.badRequest().body("Invalid two-factor authentication code");
+        }
+
     }
 
     @GetMapping("/info/{id}")

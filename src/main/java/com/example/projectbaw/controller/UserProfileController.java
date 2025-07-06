@@ -6,10 +6,10 @@ import com.example.projectbaw.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,5 +34,13 @@ public class UserProfileController {
 
         return ResponseEntity.ok(profile);
 
+    }
+
+    @PutMapping("/upload-image")
+    public ResponseEntity<?> uploadImage(@RequestParam("photo") MultipartFile file) throws IOException {
+
+        userProfileService.uploadImage(file.getBytes());
+
+        return ResponseEntity.ok("Image uploaded successfully");
     }
 }

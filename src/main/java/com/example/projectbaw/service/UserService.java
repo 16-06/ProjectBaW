@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -47,6 +48,7 @@ public class UserService {
         user.setPassword(bCryptPasswordEncoder.encode(userMapper.toRegister(requestDto).getPassword()));
         user.setEmail(userMapper.toRegister(requestDto).getEmail());
         user.setEnabledAccount(false);
+        user.setTwoFactorEnabled(false);
         user.setRole(Role.USER);
 
         String token = UUID.randomUUID().toString();
@@ -61,15 +63,69 @@ public class UserService {
         emailConfirmationService.sendConfirmationEmail(user.getEmail(), token);
     }
 
-    public Optional<String> login(String username, String password){
+    public boolean isAccountEnabled(String username) {
 
         return userRepository.findByUsername(username)
+                .map(User::isEnabledAccount)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public Optional<String> login(String username, String password){
+
+                return userRepository.findByUsername(username)
                 .filter(user -> user.isEnabledAccount() && bCryptPasswordEncoder.matches(password, user.getPassword()))
                 .map(user -> {
-                    String token = jwtUtil.generateToken(user);
-                    return token;
-                });
+                    if(user.isTwoFactorEnabled()) {
+
+                        String code = String.format("%04d", new Random().nextInt(9999));
+                        user.setTwoFactorCode(code);
+                        user.setCodeExpiryTime(LocalDateTime.now().plusMinutes(5));
+                        emailConfirmationService.sendTwoFactorCode(user.getEmail(), code);
+                        userRepository.save(user);
+
+                        return null;
+
+                    }
+                    else {
+                        return jwtUtil.generateToken(user);
+                    }
+
+                }
+
+                );
+
     }
+
+    public String verifyTwoFactorCode(String username, String code) {
+
+        Optional<User> userOptional= userRepository.findByUsername(username);
+
+        if(userOptional.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+
+        User user = userOptional.get();
+
+        if(user.getTwoFactorCode() == null || user.getCodeExpiryTime() == null) {
+            throw new RuntimeException("Two-factor authentication is not enabled for this user");
+        }
+
+        if(LocalDateTime.now().isAfter(user.getCodeExpiryTime())) {
+            throw new RuntimeException("Two-factor code has expired");
+        }
+
+        if(user.getTwoFactorCode().equals(code)) {
+
+            user.setTwoFactorCode(null);
+            user.setCodeExpiryTime(null);
+            userRepository.save(user);
+
+            return jwtUtil.generateToken(user);
+        }
+
+        return new RuntimeException("Two-factor code is incorrect").getMessage();
+    }
+
 
     public Optional<UserDto.ResponseDto> getById(Long id){
 

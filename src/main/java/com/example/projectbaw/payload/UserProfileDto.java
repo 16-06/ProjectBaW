@@ -65,5 +65,6 @@ public class UserProfileDto {
         public void setAvatarImage(byte[] avatarImage) { this.avatarImage = avatarImage;
     }
 
+
 }
 }
