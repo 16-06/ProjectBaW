@@ -67,7 +67,7 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/changepassword")
+    @PutMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody UserDto.ChangePassDto requestDto) {
 
         boolean result = userService.changePassword(requestDto.getPassword(),requestDto.getNewPassword());
@@ -91,9 +91,9 @@ public class UserController {
     }
 
     @GetMapping("/check")
-    public ResponseEntity<?> isAdmin() {
+    public ResponseEntity<?> getUsersByAdmin() {
 
-        List<UserDto.ResponseDto> users = userService.isAdmin();
+        List<UserDto.ResponseDto> users = userService.adminGetAllUsers();
 
         return ResponseEntity.ok(users);
 

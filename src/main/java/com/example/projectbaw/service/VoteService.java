@@ -49,8 +49,15 @@ public class VoteService {
 
     }
 
-    public List<Vote> getByUser(String user) {
-        return voteRepository.findByUserUsername(user);
+    public List<VoteDto.ResponseDto> getUserVotes(String username){
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        return voteRepository.findByUserId(user.getId())
+                .stream()
+                .map(voteMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     public List<VoteDto.ResponseDto> getByUserId(Long id) {
