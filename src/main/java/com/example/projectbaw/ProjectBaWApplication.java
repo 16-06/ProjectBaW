@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ProjectBaWApplication {
 
     public static void main(String[] args) {
+        System.out.println("🚀 Starting application...");
         SpringApplication.run(ProjectBaWApplication.class, args);
     }
 

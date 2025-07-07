@@ -4,9 +4,11 @@ import com.example.projectbaw.config.JwtUtil;
 import com.example.projectbaw.mapper.UserMapper;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.UserProfile;
+import com.example.projectbaw.model.UserSecurity;
 import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.repository.UserProfileRepository;
 import com.example.projectbaw.repository.UserRepository;
+import com.example.projectbaw.repository.UserSecurityRepository;
 import com.example.projectbaw.role.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +30,8 @@ public class UserService {
     private final BCryptPasswordEncoder     bCryptPasswordEncoder;
     private final UserMapper                userMapper;
     private final EmailConfirmationService  emailConfirmationService;
-    private final UserProfileRepository     userProfileRepository;
     private final JwtUtil                   jwtUtil;
+    private final UserSecurityRepository    userSecurityRepository;
 
     @Transactional
     public void registerUser(UserDto.RegisterDto requestDto) {
@@ -51,14 +53,18 @@ public class UserService {
         user.setTwoFactorEnabled(false);
         user.setRole(Role.USER);
 
-        String token = UUID.randomUUID().toString();
-        user.setActivationToken(token);
-
         UserProfile userProfile = new UserProfile();
         userProfile.setUser(user);
 
+        UserSecurity userSecurity = new UserSecurity();
+        userSecurity.setUser(user);
+        String token = UUID.randomUUID().toString();
+        userSecurity.setActivationToken(token);
+
+        user.setProfile(userProfile);
+        user.setSecurityData(userSecurity);
+
         userRepository.save(user);
-        userProfileRepository.save(userProfile);
 
         emailConfirmationService.sendConfirmationEmail(user.getEmail(), token);
     }
@@ -78,8 +84,8 @@ public class UserService {
                     if(user.isTwoFactorEnabled()) {
 
                         String code = String.format("%04d", new Random().nextInt(9999));
-                        user.setTwoFactorCode(code);
-                        user.setCodeExpiryTime(LocalDateTime.now().plusMinutes(5));
+                        user.getSecurityData().setTwoFactorCode(code);
+                        user.getSecurityData().setCodeExpiryTime(LocalDateTime.now().plusMinutes(5));
                         emailConfirmationService.sendTwoFactorCode(user.getEmail(), code);
                         userRepository.save(user);
 
@@ -106,18 +112,18 @@ public class UserService {
 
         User user = userOptional.get();
 
-        if(user.getTwoFactorCode() == null || user.getCodeExpiryTime() == null) {
+        if(user.getSecurityData().getTwoFactorCode() == null || user.getSecurityData().getCodeExpiryTime() == null) {
             throw new RuntimeException("Two-factor authentication is not enabled for this user");
         }
 
-        if(LocalDateTime.now().isAfter(user.getCodeExpiryTime())) {
+        if(LocalDateTime.now().isAfter(user.getSecurityData().getCodeExpiryTime())) {
             throw new RuntimeException("Two-factor code has expired");
         }
 
-        if(user.getTwoFactorCode().equals(code)) {
+        if(user.getSecurityData().getTwoFactorCode().equals(code)) {
 
-            user.setTwoFactorCode(null);
-            user.setCodeExpiryTime(null);
+            user.getSecurityData().setTwoFactorCode(null);
+            user.getSecurityData().setCodeExpiryTime(null);
             userRepository.save(user);
 
             return jwtUtil.generateToken(user);
@@ -150,7 +156,8 @@ public class UserService {
 
     public boolean activateAccount(String token) {
 
-        Optional<User> user = userRepository.findByActivationToken(token);
+        Optional<UserSecurity> userToken = userSecurityRepository.findByActivationToken(token);
+        Optional<User> user = userToken.map(UserSecurity::getUser);
 
         if (user.isEmpty() || user.get().isEnabledAccount()) {
             return false;
@@ -158,7 +165,7 @@ public class UserService {
 
         User confirmedUser = user.get();
         confirmedUser.setEnabledAccount(true);
-        confirmedUser.setActivationToken(null);
+        confirmedUser.getSecurityData().setActivationToken(null);
         userRepository.save(confirmedUser);
 
         return true;
@@ -166,7 +173,7 @@ public class UserService {
 
     public List<UserDto.ResponseDto> adminGetAllUsers() {
 
-        // Test method to check the authenticated user is admin,
+        // Test method to check if the authenticated user is admin,
         // Manual check method not recommended for production use, for education only
         // Target Auth Method - @PreAuthorize("hasRole('ADMIN')") & SecurityFilterChain
 
@@ -207,7 +214,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String resetToken = UUID.randomUUID().toString();
-        user.setResetPasswordToken(resetToken);
+        user.getSecurityData().setResetPasswordToken(resetToken);
 
         userRepository.save(user);
 
@@ -215,15 +222,17 @@ public class UserService {
     }
 
     public boolean resetPassword(String token, String newPassword) {
-        User user = userRepository.findByResetPasswordToken(token)
+        UserSecurity userToken = userSecurityRepository.findByResetPasswordToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid reset token"));
+
+        User user = userToken.getUser();
 
         if (newPassword.length() < 8) {
             throw new IllegalArgumentException("Password must be at least 8 characters long");
         }
 
         user.setPassword(bCryptPasswordEncoder.encode(newPassword));
-        user.setResetPasswordToken(null);
+        user.getSecurityData().setResetPasswordToken(null);
         userRepository.save(user);
 
         return true;

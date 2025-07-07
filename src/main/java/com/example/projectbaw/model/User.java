@@ -23,14 +23,10 @@ public class User {
     private String username;
     private String email;
     private String password;
-    private String activationToken;
-    private String resetPasswordToken;
-    private String TwoFactorCode;
     private boolean enabledAccount;
     private boolean twoFactorEnabled;
     private boolean bannedAccount = false;
-    LocalDateTime CodeExpiryTime;
-    LocalDateTime BanExpiryTime = null;
+
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -41,6 +37,9 @@ public class User {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WhoVotedYet> whoVotedYet;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserSecurity securityData;
 }

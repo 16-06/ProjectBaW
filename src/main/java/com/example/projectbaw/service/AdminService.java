@@ -64,7 +64,7 @@ public class AdminService {
         }
 
         user.setBannedAccount(true);
-        user.setBanExpiryTime(date);
+        user.getSecurityData().setBanExpiryTime(date);
         userRepository.save(user);
 
     }
