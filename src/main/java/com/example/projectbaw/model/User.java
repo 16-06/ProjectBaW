@@ -28,7 +28,9 @@ public class User {
     private String TwoFactorCode;
     private boolean enabledAccount;
     private boolean twoFactorEnabled;
+    private boolean bannedAccount = false;
     LocalDateTime CodeExpiryTime;
+    LocalDateTime BanExpiryTime = null;
 
     @Enumerated(EnumType.STRING)
     private Role role;

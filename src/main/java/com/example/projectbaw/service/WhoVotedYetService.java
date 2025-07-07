@@ -49,9 +49,13 @@ public class WhoVotedYetService {
         return whoVotedYetMapper.toWhoVotedYetDto(saved);
     }
 
-    public List<WhoVotedYet> findByVoteId(Long voteId){
+    public List<WhoVotedYetDto.ResponseDto> findByVoteId(Long voteId){
 
-        return whoVotedYetRepository.findByVoteId(voteId);
+        List<WhoVotedYet> whoVotedYet = whoVotedYetRepository.findByVoteId(voteId);
+
+        return whoVotedYet.stream()
+                .map(whoVotedYetMapper::toWhoVotedYetDto)
+                .collect(Collectors.toList());
 
     }
 

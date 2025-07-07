@@ -1,5 +1,6 @@
 package com.example.projectbaw.config;
 
+import com.example.projectbaw.role.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +24,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/api/**")
-                                .permitAll()
+                        auth -> auth
+                                .requestMatchers("/api/**").permitAll()
+                                .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                                 .anyRequest()
                                 .authenticated()
                 )
@@ -40,8 +42,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfing) throws Exception {
-        return authConfing.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
 

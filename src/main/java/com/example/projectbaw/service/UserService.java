@@ -164,7 +164,11 @@ public class UserService {
         return true;
     }
 
-    public List<UserDto.ResponseDto> isAdmin() {
+    public List<UserDto.ResponseDto> adminGetAllUsers() {
+
+        // Test method to check the authenticated user is admin,
+        // Manual check method not recommended for production use, for education only
+        // Target Auth Method - @PreAuthorize("hasRole('ADMIN')") & SecurityFilterChain
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (String) authentication.getPrincipal();
