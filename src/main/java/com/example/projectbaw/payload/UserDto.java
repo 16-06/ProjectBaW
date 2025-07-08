@@ -24,7 +24,6 @@ public class UserDto {
 
         private Long id;
         private String username;
-        private String token;
     }
 
     @Getter

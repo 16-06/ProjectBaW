@@ -6,7 +6,6 @@ import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.UserProfile;
 import com.example.projectbaw.model.UserSecurity;
 import com.example.projectbaw.payload.UserDto;
-import com.example.projectbaw.repository.UserProfileRepository;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.UserSecurityRepository;
 import com.example.projectbaw.role.Role;
@@ -76,11 +75,31 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    public boolean isAccountBanned(String username) {
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(user.isBannedAccount() && user.getSecurityData().getBanExpiryTime() != null && LocalDateTime.now().isAfter(user.getSecurityData().getBanExpiryTime())) {
+
+            user.setBannedAccount(false);
+            user.getSecurityData().setBanExpiryTime(null);
+            userRepository.save(user);
+            return false; // Account is no longer banned
+
+        }
+        else {
+            return user.isBannedAccount();
+        }
+
+    }
+
+
     public Optional<String> login(String username, String password){
 
                 return userRepository.findByUsername(username)
-                .filter(user -> user.isEnabledAccount() && bCryptPasswordEncoder.matches(password, user.getPassword()))
+                .filter(user -> user.isEnabledAccount() && !user.isBannedAccount() && bCryptPasswordEncoder.matches(password, user.getPassword()))
                 .map(user -> {
+
                     if(user.isTwoFactorEnabled()) {
 
                         String code = String.format("%04d", new Random().nextInt(9999));
@@ -95,11 +114,7 @@ public class UserService {
                     else {
                         return jwtUtil.generateToken(user);
                     }
-
-                }
-
-                );
-
+                });
     }
 
     public String verifyTwoFactorCode(String username, String code) {

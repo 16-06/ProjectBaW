@@ -1,0 +1,33 @@
+package com.example.projectbaw.payload;
+
+import com.example.projectbaw.role.Role;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+import java.time.temporal.ChronoUnit;
+
+@Data
+@RequiredArgsConstructor
+public class AdminDto {
+
+    @Getter
+    @Setter
+    public static class ChangeRoleDto {
+
+        private Long userId;
+        private Role newRole;
+
+    }
+
+    @Getter
+    @Setter
+    public static class BanUserDto  {
+
+        private Long userId;
+        private long durationAmount;
+        private ChronoUnit durationUnit;
+
+    }
+}

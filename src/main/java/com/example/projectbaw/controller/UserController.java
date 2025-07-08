@@ -19,7 +19,7 @@ public class UserController {
 
     private final UserService       userService;
 
-    @PostMapping("")
+    @PostMapping("/public/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDto.RegisterDto request) {
 
         userService.registerUser(request);
@@ -27,11 +27,14 @@ public class UserController {
 
     }
 
-    @PostMapping("/login")
+    @PostMapping("/public/login")
     public ResponseEntity<?> loginUser(@RequestBody UserDto.RequestDto requestDto) {
 
         if(!userService.isAccountEnabled(requestDto.getUsername())){
             return ResponseEntity.badRequest().body("Account not activated or does not exist");
+        }
+        if(userService.isAccountBanned(requestDto.getUsername())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account is banned, check your email for more information");
         }
 
         Optional<String> token =  userService.login(requestDto.getUsername(), requestDto.getPassword());
@@ -46,7 +49,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Two-factor authentication code sent");
     }
 
-    @PostMapping("/login/2fa")
+    @PostMapping("/public/login/2fa")
     public ResponseEntity<?> login(@RequestBody UserDto.TwoFactorDto dto) {
 
         String verified = userService.verifyTwoFactorCode(dto.getUsername(), dto.getCode());
@@ -78,7 +81,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("Incorrect old password or new password ");
     }
 
-    @GetMapping("/auth")
+    @GetMapping("/public/auth")
     public ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request) {
 
         Map<String, Object> userInfo = userService.getAuthenticatedUserInfo(request);
@@ -99,7 +102,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/confirm")
+    @GetMapping("/public/confirm")
     public ResponseEntity<String> confirmAccount(@RequestParam String token) {
 
         boolean result = userService.activateAccount(token);
@@ -112,7 +115,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/password-reset-request")
+    @PostMapping("/public/password-reset-request")
     public ResponseEntity<?> passwordResetRequestByEmail(@RequestBody UserDto.passwordResetRequestDto requestDto) {
 
             userService.PasswordResetByEmail(requestDto.getEmail());
@@ -120,7 +123,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/public/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody UserDto.ResetPasswordDto resetPasswordDto) {
 
         boolean result = userService.resetPassword(resetPasswordDto.getResetPasswordToken(), resetPasswordDto.getNewPassword());

@@ -17,7 +17,7 @@ public class VoteController {
 
     private final VoteService   voteService;
 
-    @GetMapping("")
+    @GetMapping("/public/all")
     public ResponseEntity<List<VoteDto.ResponseDto>> getAllVotes() {
 
         List<VoteDto.ResponseDto> votes = voteService.getAllVotes();
@@ -25,7 +25,7 @@ public class VoteController {
         return ResponseEntity.ok(votes);
     }
 
-    @GetMapping("/category")
+    @GetMapping("/public/category")
     public ResponseEntity<List<VoteDto.ResponseDto>> getVotesByCategory(@RequestParam String category) {
 
         List<VoteDto.ResponseDto> votes = voteService.getByCategory(category);

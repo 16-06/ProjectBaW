@@ -21,7 +21,7 @@ public interface VoteCommentMapper {
     VoteComment toEntity(VoteCommentDto.RequestDto requestDto);
 }
 
-//              Normal mapper, but I will try to use MapStruct for education purposes
+//              Normal mapper, but I will try to use MapStruct for educational purposes
 
 //@Component
 //@RequiredArgsConstructor

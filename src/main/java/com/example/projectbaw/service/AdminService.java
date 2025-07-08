@@ -1,70 +1,55 @@
 package com.example.projectbaw.service;
 
-
-import com.example.projectbaw.mapper.UserMapper;
-import com.example.projectbaw.mapper.VoteMapper;
 import com.example.projectbaw.model.User;
-import com.example.projectbaw.model.Vote;
-import com.example.projectbaw.payload.UserDto;
-import com.example.projectbaw.payload.VoteDto;
-import com.example.projectbaw.repository.UserProfileRepository;
-import com.example.projectbaw.repository.UserRepository;
-import com.example.projectbaw.repository.VoteOptionRepository;
-import com.example.projectbaw.repository.VoteRepository;
+import com.example.projectbaw.payload.AdminDto;
+import com.example.projectbaw.repository.*;
 import com.example.projectbaw.role.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class AdminService {
 
     private final UserRepository userRepository;
-    private final VoteRepository voteRepository;
-    private final VoteOptionRepository voteOptionRepository;
-    private final UserProfileRepository userProfileRepository;
-    private final VoteMapper voteMapper;
-    private final UserMapper userMapper;
+    private final EmailConfirmationService emailConfirmationService;
 
-    public void deleteUser(Long id)         {userRepository.deleteById(id);}
-    public void deleteVote(Long id)         {voteRepository.deleteById(id);}
-    public void deleteVoteOption(Long id)   {voteOptionRepository.deleteById(id);}
-    public void deleteUserProfile(Long id)  {userProfileRepository.deleteById(id);}
 
-    public void changeUserRole(Long userId, Role newRole){
+    public void changeUserRole(AdminDto.ChangeRoleDto changeRoleDto){
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(changeRoleDto.getUserId())
                 .orElseThrow(()-> new RuntimeException("User not found"));
 
         if(user.getRole() == Role.ADMIN){
             throw new RuntimeException("Admin cannot be changed to another role");
         }
 
-        if(user.getRole() == newRole){
+        if(user.getRole() == changeRoleDto.getNewRole()){
             throw new RuntimeException("User already has this role");
         }
 
-        user.setRole(newRole);
+        user.setRole(changeRoleDto.getNewRole());
         userRepository.save(user);
 
     }
 
-    public void blockUser(Long userId, LocalDateTime date){
+    public void blockUser(AdminDto.BanUserDto banUserDto){
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(banUserDto.getUserId())
                 .orElseThrow(()-> new RuntimeException("User not found"));
 
         if(user.isBannedAccount()){
             throw new RuntimeException("User already blocked");
         }
 
+        LocalDateTime banUntil = LocalDateTime.now().plus(banUserDto.getDurationAmount(), banUserDto.getDurationUnit());
+
         user.setBannedAccount(true);
-        user.getSecurityData().setBanExpiryTime(date);
+        user.getSecurityData().setBanExpiryTime(banUntil);
+        emailConfirmationService.sendBanInfo(user.getEmail(), banUntil.toString());
         userRepository.save(user);
 
     }
@@ -79,17 +64,11 @@ public class AdminService {
         }
 
         user.setBannedAccount(false);
+        user.getSecurityData().setBanExpiryTime(null);
+        userRepository.save(user);
     }
 
-    public List<UserDto.ResponseDto> getAllUsers(){
 
-        List<User> users = userRepository.findAll();
-
-        return users
-                .stream()
-                .map(userMapper::toUserDto)
-                .collect(Collectors.toList());
-    }
 
 
 

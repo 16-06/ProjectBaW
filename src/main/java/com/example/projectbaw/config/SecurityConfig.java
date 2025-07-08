@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,10 +24,23 @@ public class SecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/api/**").permitAll()
+                                .requestMatchers(
+                                        "/api/users/public/**",
+                                        "/api/vote/public/**"
+                                )
+                                .permitAll()
                                 .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
-                                .anyRequest()
-                                .authenticated()
+                                .requestMatchers("/api/moderator/**").hasAnyRole(Role.ADMIN.name(),Role.MODERATOR.name())
+                                .requestMatchers(
+                                        "/api/users/**",
+                                        "/api/profile/**",
+                                        "/api/vote-comments/**",
+                                        "/api/vote/**",
+                                        "/api/whoVoted/**",
+                                        "/api/vote-options/**"
+                                ).hasAnyRole(Role.USER.name(),Role.ADMIN.name(),Role.MODERATOR.name())
+
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
