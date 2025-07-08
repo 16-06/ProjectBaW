@@ -5,17 +5,20 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Data
 @RequiredArgsConstructor
-public class VoteOptionDto {
+public class VoteCommentDto {
+
 
     @Getter
     @Setter
     public static class RequestDto {
 
-        private String name;
-        private byte[] imagedata;
+        private String commentBody;
         private Long voteId;
+        private Long commentAuthorId;
 
     }
 
@@ -24,11 +27,11 @@ public class VoteOptionDto {
     public static class ResponseDto {
 
         private Long id;
-        private String name;
-        private int count;
-        private byte[] imagedata;
+        private String commentBody;
+        private Long commentAuthorId;
         private Long voteId;
+        private LocalDateTime createdAt;
+        private String commentAuthorUsername;
 
     }
 }
-

@@ -33,5 +33,8 @@ public class Vote {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VoteComment> comments;
+
 }
 
