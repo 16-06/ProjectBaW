@@ -18,7 +18,7 @@ public class VoteOptionMapper {
         responseDto.setId(voteOption.getId());
         responseDto.setCount(voteOption.getCount());
         responseDto.setName(voteOption.getName());
-        responseDto.setImagedata(voteOption.getImagedata());
+        responseDto.setImageData(voteOption.getImageData());
         responseDto.setVoteId(voteOption.getVote().getId());
 
         return responseDto;
@@ -31,7 +31,7 @@ public class VoteOptionMapper {
 
         VoteOption voteOption = new VoteOption();
         voteOption.setName(requestDto.getName());
-        voteOption.setImagedata(requestDto.getImagedata());
+        voteOption.setImageData(requestDto.getImageData());
         voteOption.setCount(0);
         return voteOption;
     }

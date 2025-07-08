@@ -25,7 +25,7 @@ public class VoteMapper {
         responseDto.setAuthor(vote.getAuthor());
         responseDto.setCategory(vote.getCategory());
         responseDto.setName(vote.getName());
-        responseDto.setImagedata(vote.getImage());
+        responseDto.setImageData(vote.getImage());
 
 
         if(vote.getVoteOptions() != null){
@@ -47,7 +47,7 @@ public class VoteMapper {
         vote.setAuthor(requestDto.getAuthor());
         vote.setCategory(requestDto.getCategory());
         vote.setName(requestDto.getName());
-        vote.setImage(requestDto.getImagedata());
+        vote.setImage(requestDto.getImageData());
 
         if(requestDto.getOptions() != null) {
             vote.setVoteOptions(requestDto.getOptions()

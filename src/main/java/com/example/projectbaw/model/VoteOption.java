@@ -18,7 +18,7 @@ public class VoteOption {
 
     private String name;
     private int count = 0;
-    private byte[] imagedata;
+    private byte[] imageData;
 
     @ManyToOne
     @JoinColumn(name = "vote_id", nullable = false)

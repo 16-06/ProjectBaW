@@ -17,7 +17,7 @@ public class VoteDto {
         private String name;
         private String author;
         private String category;
-        private byte[] imagedata;
+        private byte[] imageData;
         private List<VoteOptionDto.RequestDto> options;
 
     }
@@ -29,7 +29,7 @@ public class VoteDto {
         private String name;
         private String author;
         private String category;
-        private byte[] imagedata;
+        private byte[] imageData;
         private List<VoteOptionDto.ResponseDto> options;
     }
 }

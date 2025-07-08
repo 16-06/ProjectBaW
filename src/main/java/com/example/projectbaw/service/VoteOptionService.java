@@ -103,7 +103,7 @@ public class VoteOptionService {
 
         if(vote != null){
 
-            voteOption.setImagedata(newImage);
+            voteOption.setImageData(newImage);
             voteOptionRepository.save(voteOption);
         }
         else{

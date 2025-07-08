@@ -14,7 +14,7 @@ public class VoteOptionDto {
     public static class RequestDto {
 
         private String name;
-        private byte[] imagedata;
+        private byte[] imageData;
         private Long voteId;
 
     }
@@ -26,7 +26,7 @@ public class VoteOptionDto {
         private Long id;
         private String name;
         private int count;
-        private byte[] imagedata;
+        private byte[] imageData;
         private Long voteId;
 
     }
