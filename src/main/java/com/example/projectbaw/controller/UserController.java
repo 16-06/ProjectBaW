@@ -53,12 +53,8 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody UserDto.TwoFactorDto dto) {
 
         String verified = userService.verifyTwoFactorCode(dto.getUsername(), dto.getCode());
+        return ResponseEntity.ok(verified);
 
-        if (verified != null) {
-            return ResponseEntity.ok(verified);
-        } else {
-            return ResponseEntity.badRequest().body("Invalid two-factor authentication code");
-        }
 
     }
 

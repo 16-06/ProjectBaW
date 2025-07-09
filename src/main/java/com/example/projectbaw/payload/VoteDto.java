@@ -14,6 +14,7 @@ public class VoteDto {
     @Getter
     @Setter
     public static class RequestDto {
+
         private String name;
         private String author;
         private String category;
@@ -32,4 +33,5 @@ public class VoteDto {
         private byte[] imageData;
         private List<VoteOptionDto.ResponseDto> options;
     }
+
 }

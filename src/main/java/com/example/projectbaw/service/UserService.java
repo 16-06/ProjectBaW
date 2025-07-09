@@ -11,12 +11,14 @@ import com.example.projectbaw.repository.UserSecurityRepository;
 import com.example.projectbaw.role.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,6 +59,7 @@ public class UserService {
 
         UserSecurity userSecurity = new UserSecurity();
         userSecurity.setUser(user);
+
         String token = UUID.randomUUID().toString();
         userSecurity.setActivationToken(token);
 
@@ -144,7 +147,8 @@ public class UserService {
             return jwtUtil.generateToken(user);
         }
 
-        return new RuntimeException("Two-factor code is incorrect").getMessage();
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid two-factor authentication code");
+
     }
 
 

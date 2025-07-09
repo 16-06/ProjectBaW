@@ -1,6 +1,9 @@
 package com.example.projectbaw.config;
 
+import com.example.projectbaw.o2Auth.CustomO2Auth;
+import com.example.projectbaw.o2Auth.oAuth2LoginSuccessHandler;
 import com.example.projectbaw.role.Role;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,17 +22,20 @@ public class SecurityConfig {
 
     private final JwtAuthFilter     jwtAuthFilter;
     private final RateLimitFilter   rateLimitFilter;
+    private final CustomO2Auth      customO2Auth;
+    private final oAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable())
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(
                                         "/api/users/public/**",
-                                        "/api/vote/public/**"
-                                )
-                                .permitAll()
+                                        "/api/vote/public/**",
+                                        "/api/oauth2/**"
+                                ).permitAll()
                                 .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers("/api/moderator/**").hasAnyRole(Role.ADMIN.name(),Role.MODERATOR.name())
                                 .requestMatchers(
@@ -43,6 +49,17 @@ public class SecurityConfig {
 
                                 .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth -> oauth
+                        .userInfoEndpoint(userInfo ->
+                                userInfo.userService(customO2Auth))
+                        .loginPage("/oauth2/authorization/google")
+                        .successHandler(oAuth2LoginSuccessHandler)
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        })
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(rateLimitFilter,   UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter,     UsernamePasswordAuthenticationFilter.class);
@@ -50,10 +67,6 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
-    public BCryptPasswordEncoder BCryptpasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
