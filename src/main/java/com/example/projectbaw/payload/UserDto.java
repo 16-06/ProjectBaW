@@ -75,4 +75,11 @@ public class UserDto {
         private String code;
 
     }
+
+    @Getter
+    @Setter
+    public static class LoginDto {
+        private String username;
+        private String password;
+    }
 }

@@ -78,6 +78,13 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    public boolean isTwoFactorEnabled(String username) {
+
+        return userRepository.findByUsername(username)
+                .map(User::isEnabledAccount)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     public boolean isAccountBanned(String username) {
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -97,28 +104,38 @@ public class UserService {
     }
 
 
-    public Optional<String> login(String username, String password){
+    public Optional<String> login(UserDto.LoginDto requestDto) {
 
-                return userRepository.findByUsername(username)
-                .filter(user -> user.isEnabledAccount() && !user.isBannedAccount() && bCryptPasswordEncoder.matches(password, user.getPassword()))
-                .map(user -> {
+        Optional<User> userOpt = userRepository.findByUsername(requestDto.getUsername());
 
-                    if(user.isTwoFactorEnabled()) {
+        if(userOpt.isEmpty() || !userOpt.get().isEnabledAccount() || userOpt.get().isBannedAccount()) {
+            return Optional.empty();
+        }
 
-                        String code = String.format("%04d", new Random().nextInt(9999));
-                        user.getSecurityData().setTwoFactorCode(code);
-                        user.getSecurityData().setCodeExpiryTime(LocalDateTime.now().plusMinutes(5));
-                        emailConfirmationService.sendTwoFactorCode(user.getEmail(), code);
-                        userRepository.save(user);
+        User user = userOpt.get();
 
-                        return null;
+        if(!bCryptPasswordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+            return Optional.empty();
+        }
 
-                    }
-                    else {
-                        return jwtUtil.generateToken(user);
-                    }
-                });
+        if (user.isTwoFactorEnabled()) {
+
+                String code = String.format("%04d", new Random().nextInt(9999));
+                user.getSecurityData().setTwoFactorCode(code);
+                user.getSecurityData().setCodeExpiryTime(LocalDateTime.now().plusMinutes(5));
+                emailConfirmationService.sendTwoFactorCode(user.getEmail(), code);
+                userRepository.save(user);
+
+            return Optional.empty();
+
+        } else {
+
+            String token = jwtUtil.generateToken(user);
+            return Optional.of(token);
+        }
+
     }
+
 
     public String verifyTwoFactorCode(String username, String code) {
 
@@ -131,7 +148,7 @@ public class UserService {
         User user = userOptional.get();
 
         if(user.getSecurityData().getTwoFactorCode() == null || user.getSecurityData().getCodeExpiryTime() == null) {
-            throw new RuntimeException("Two-factor authentication is not enabled for this user");
+            throw new RuntimeException("Two-factor authentication is not initialized, login first");
         }
 
         if(LocalDateTime.now().isAfter(user.getSecurityData().getCodeExpiryTime())) {

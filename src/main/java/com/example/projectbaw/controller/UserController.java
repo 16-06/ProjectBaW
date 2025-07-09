@@ -28,25 +28,30 @@ public class UserController {
     }
 
     @PostMapping("/public/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserDto.RequestDto requestDto) {
+    public ResponseEntity<?> loginUser(@RequestBody UserDto.LoginDto requestDto) {
 
         if(!userService.isAccountEnabled(requestDto.getUsername())){
-            return ResponseEntity.badRequest().body("Account not activated or does not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account not activated or does not exist");
         }
+
         if(userService.isAccountBanned(requestDto.getUsername())){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account is banned, check your email for more information");
         }
 
-        Optional<String> token =  userService.login(requestDto.getUsername(), requestDto.getPassword());
+        Optional<String> token = userService.login(requestDto);
 
-        if(token.isPresent()) {
-            return token
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.badRequest().body("Invalid credentials or account not activated"));
+        if (token.isEmpty() && userService.isTwoFactorEnabled(requestDto.getUsername())) {
+            return ResponseEntity.accepted()
+                    .body("Two-factor authentication required, please provide the code sent to your email");
         }
 
+        if (token.isPresent()) {
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Two-factor authentication code sent");
+            return token.map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials"));
+        }
+
+        return ResponseEntity.badRequest().body("Login failed, please check your credentials or account activation status");
     }
 
     @PostMapping("/public/login/2fa")
