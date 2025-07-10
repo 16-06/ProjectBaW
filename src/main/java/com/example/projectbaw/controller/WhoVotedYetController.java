@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/whoVoted")
 public class WhoVotedYetController {

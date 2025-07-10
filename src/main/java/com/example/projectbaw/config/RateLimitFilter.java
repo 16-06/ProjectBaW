@@ -54,9 +54,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String userKey = username != null ? "USER:" + username : null;
         String endpointKey = endpoint != null ? "ENDPOINT:" + endpoint : null;
 
-        int ipLimit = isAdmin ? 200 : 20;
-        int endpointLimit = isAdmin ? 100 : 10;
-        int userLimit = isAdmin ? 50 : 15;
+        int ipLimit = isAdmin ? 200 : 50;
+        int endpointLimit = isAdmin ? 100 : 50;
+        int userLimit = isAdmin ? 150 : 50;
 
         Bucket ipBucket =                       buckets.computeIfAbsent(ipKey, k -> createNewBucket(ipLimit, Duration.ofMinutes(1)));
         Bucket endPointBucket =                 buckets.computeIfAbsent(endpointKey, k -> createNewBucket(endpointLimit, Duration.ofMinutes(1)));

@@ -24,31 +24,31 @@ public class ModeratorController {
         return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/delete-user")
+    @DeleteMapping("/delete-user")
     public ResponseEntity<String> deleteUser(@RequestBody Long id) {
         moderatorService.deleteUser(id);
         return ResponseEntity.ok("User deleted successfully");
     }
 
-    @PostMapping("/delete-vote")
+    @DeleteMapping("/delete-vote")
     public ResponseEntity<String> deleteVote(@RequestBody Long id) {
         moderatorService.deleteVote(id);
         return ResponseEntity.ok("Vote deleted successfully");
     }
 
-    @PostMapping("/delete-vote-option")
+    @DeleteMapping("/delete-vote-option")
     public ResponseEntity<String> deleteVoteOption(@RequestBody Long id) {
         moderatorService.deleteVoteOption(id);
         return ResponseEntity.ok("Vote option deleted successfully");
     }
 
-    @PostMapping("/delete-user-profile")
+    @DeleteMapping("/delete-user-profile")
     public ResponseEntity<String> deleteUserProfile(@RequestBody Long id) {
         moderatorService.deleteUserProfile(id);
         return ResponseEntity.ok("User profile deleted successfully");
     }
 
-    @PostMapping("/delete-vote-comment")
+    @DeleteMapping("/delete-vote-comment")
     public ResponseEntity<String> deleteVoteComment(@RequestBody Long id) {
         moderatorService.deleteVoteComment(id);
         return ResponseEntity.ok("Vote comment deleted successfully");
