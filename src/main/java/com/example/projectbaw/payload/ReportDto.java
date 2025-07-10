@@ -36,5 +36,13 @@ public class ReportDto {
         ContentType contentType;
     }
 
+    @Getter
+    @Setter
+    public static class ChangeStatusDto {
+
+        Long id;
+        ResolutionStatus status;
+    }
+
 
 }

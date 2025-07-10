@@ -6,10 +6,7 @@ import com.example.projectbaw.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,10 +16,15 @@ public class ReportController {
     private final ReportService reportService;
 
     @PostMapping("/user/create")
-    public ResponseEntity<?> createReport(ReportDto.RequestDto request, Long userId) {
+    public ResponseEntity<?> createReport(@RequestBody ReportDto.RequestDto request) {
 
-        ReportDto.ResponseDto response = reportService.createReport(request, userId);
+        ReportDto.ResponseDto response = reportService.createReport(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user/reports")
+    public ResponseEntity<?> getUserReports() {
+        return ResponseEntity.ok(reportService.findUserReports());
     }
 
     @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
@@ -32,7 +34,7 @@ public class ReportController {
     }
 
     @GetMapping("/user/checkStatus")
-    public ResponseEntity<?> checkReportStatus(Long reportId) {
+    public ResponseEntity<?> checkReportStatus(@RequestBody Long reportId) {
 
         ReportDto.ResponseDto response = reportService.findReportById(reportId);
         return ResponseEntity.ok(response);
@@ -40,8 +42,9 @@ public class ReportController {
 
     @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     @PostMapping("/moderator/changeStatus")
-    public ResponseEntity<?> changeReportStatus(Long reportId, ResolutionStatus status) {
+    public ResponseEntity<?> changeReportStatus(@RequestBody ReportDto.ChangeStatusDto changeStatusDto) {
 
-        return ResponseEntity.ok(reportService.changeReportStatus(reportId, status));
+        return ResponseEntity.ok(reportService.changeReportStatus(changeStatusDto));
     }
+
 }

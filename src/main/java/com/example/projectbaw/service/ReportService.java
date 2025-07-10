@@ -34,6 +34,26 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
+    public List<ReportDto.ResponseDto> findUserReports(){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Report> reports = reportRepository.findByReporterId(user.getId());
+
+        if (reports.isEmpty()) {
+            throw new RuntimeException("No reports found for this user");
+        }
+
+        return reports.stream()
+                .map(reportMapper::toResponseDto)
+                .collect(Collectors.toList());
+
+    }
+
     public ReportDto.ResponseDto findReportById(Long id) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,9 +73,12 @@ public class ReportService {
 
     }
 
-    public ReportDto.ResponseDto createReport(ReportDto.RequestDto request, Long userId) {
+    public ReportDto.ResponseDto createReport(ReportDto.RequestDto request) {
 
-        User reporter = userRepository.findById(userId)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) authentication.getPrincipal();
+
+        User reporter = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Report report = reportMapper.toEntity(request);
@@ -65,12 +88,12 @@ public class ReportService {
         return reportMapper.toResponseDto(report);
     }
 
-    public ReportDto.ResponseDto changeReportStatus(Long id, ResolutionStatus status) {
+    public ReportDto.ResponseDto changeReportStatus(ReportDto.ChangeStatusDto changeStatusDto) {
 
-        Report report = reportRepository.findById(id)
+        Report report = reportRepository.findById(changeStatusDto.getId())
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
-        report.setStatus(status);
+        report.setStatus(changeStatusDto.getStatus());
         reportRepository.save(report);
 
         return reportMapper.toResponseDto(report);
