@@ -5,6 +5,13 @@
     <property name="ERROR_LOG" value="${LOG_PATH}/error.log"/>
     <property name="INFO_LOG" value="${LOG_PATH}/application.log"/>
 
+    <!-- Appender do konsoli -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- Appender do błędów -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${ERROR_LOG}</file>
@@ -41,6 +48,7 @@
 
     <!-- Root logger -->
     <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
         <appender-ref ref="INFO_FILE"/>
         <appender-ref ref="ERROR_FILE"/>
     </root>

@@ -4,7 +4,7 @@ import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.UserProfile;
 import com.example.projectbaw.model.UserSecurity;
 import com.example.projectbaw.repository.UserRepository;
-import com.example.projectbaw.role.Role;
+import com.example.projectbaw.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

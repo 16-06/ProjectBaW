@@ -1,4 +1,4 @@
-package com.example.projectbaw.role;
+package com.example.projectbaw.enums;
 
 public enum Role {
     MODERATOR,

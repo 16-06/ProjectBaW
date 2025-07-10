@@ -1,11 +1,10 @@
 package com.example.projectbaw.model;
-import com.example.projectbaw.role.Role;
+import com.example.projectbaw.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -45,4 +44,7 @@ public class User {
 
     @OneToMany(mappedBy = "commentAuthor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteComment> comments;
+
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports;
 }

@@ -2,7 +2,7 @@ package com.example.projectbaw.config;
 
 import com.example.projectbaw.o2Auth.CustomO2Auth;
 import com.example.projectbaw.o2Auth.oAuth2LoginSuccessHandler;
-import com.example.projectbaw.role.Role;
+import com.example.projectbaw.enums.Role;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -45,13 +45,17 @@ public class SecurityConfig {
                                         "/api/oauth2/**"
                                 ).permitAll()
                                 .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
-                                .requestMatchers("/api/moderator/**").hasAnyRole(Role.ADMIN.name(),Role.MODERATOR.name())
+                                .requestMatchers(
+                                        "/api/moderator/**",
+                                        "/api/report/moderator/**"
+                                ).hasAnyRole(Role.ADMIN.name(),Role.MODERATOR.name())
                                 .requestMatchers(
                                         "/api/users/**",
                                         "/api/profile/**",
                                         "/api/vote-comments/**",
                                         "/api/vote/**",
                                         "/api/whoVoted/**",
+                                        "/api/report/user/**",
                                         "/api/vote-options/**"
                                 ).hasAnyRole(Role.USER.name(),Role.ADMIN.name(),Role.MODERATOR.name())
 

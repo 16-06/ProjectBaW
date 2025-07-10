@@ -8,7 +8,7 @@ import com.example.projectbaw.model.UserSecurity;
 import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.UserSecurityRepository;
-import com.example.projectbaw.role.Role;
+import com.example.projectbaw.enums.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

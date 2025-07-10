@@ -1,6 +1,6 @@
 package com.example.projectbaw.payload;
 
-import com.example.projectbaw.role.Role;
+import com.example.projectbaw.enums.Role;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

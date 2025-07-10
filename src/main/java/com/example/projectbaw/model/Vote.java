@@ -36,5 +36,7 @@ public class Vote {
     @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteComment> comments;
 
+
+
 }
 

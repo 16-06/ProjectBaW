@@ -3,7 +3,7 @@ package com.example.projectbaw.service;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.payload.AdminDto;
 import com.example.projectbaw.repository.*;
-import com.example.projectbaw.role.Role;
+import com.example.projectbaw.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
