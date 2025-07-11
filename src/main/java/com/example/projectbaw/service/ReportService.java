@@ -1,7 +1,6 @@
 package com.example.projectbaw.service;
 
 
-import com.example.projectbaw.enums.ResolutionStatus;
 import com.example.projectbaw.mapper.ReportMapper;
 import com.example.projectbaw.model.Report;
 import com.example.projectbaw.model.User;
@@ -21,9 +20,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReportService {
 
-    private final ReportRepository reportRepository;
-    private final UserRepository userRepository;
-    private final ReportMapper reportMapper;
+    private final ReportRepository      reportRepository;
+    private final UserRepository        userRepository;
+    private final ReportMapper          reportMapper;
+    private final NotificationService   notificationService;
 
     public List<ReportDto.ResponseDto> findAllReports() {
 
@@ -95,6 +95,12 @@ public class ReportService {
 
         report.setStatus(changeStatusDto.getStatus());
         reportRepository.save(report);
+
+        notificationService.notifyUser(
+                report.getReporter().getProfile(),
+                "Report number #" + report.getId(),
+                "Status changed: " + report.getStatus().name()
+        );
 
         return reportMapper.toResponseDto(report);
 

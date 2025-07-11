@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -24,7 +26,11 @@ public class UserProfile {
     private String lastName;
     private String bio;
     private String interests;
+    private boolean notificationsEnabled = true;
 
     @Lob
     private byte[] avatarImage;
+
+    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notification;
 }

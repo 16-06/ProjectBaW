@@ -47,4 +47,5 @@ public class User {
 
     @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports;
+
 }

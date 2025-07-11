@@ -39,6 +39,7 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/swagger-ui.html"
                                 ).permitAll()
+                                .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers(
                                         "/api/users/public/**",
                                         "/api/vote/public/**",
@@ -56,6 +57,7 @@ public class SecurityConfig {
                                         "/api/vote/**",
                                         "/api/whoVoted/**",
                                         "/api/report/user/**",
+                                        "/api/notification/**",
                                         "/api/vote-options/**"
                                 ).hasAnyRole(Role.USER.name(),Role.ADMIN.name(),Role.MODERATOR.name())
 
