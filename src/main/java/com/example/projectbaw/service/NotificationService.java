@@ -1,5 +1,6 @@
 package com.example.projectbaw.service;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.NotificationMapper;
 import com.example.projectbaw.model.Notification;
 import com.example.projectbaw.model.User;
@@ -9,8 +10,6 @@ import com.example.projectbaw.repository.NotificationRepository;
 import com.example.projectbaw.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -42,19 +41,18 @@ public class NotificationService {
 
         NotificationDto.ResponseDto dto = notificationMapper.toResponseDto(notification);
 
-        messagingTemplate.convertAndSendToUser(
-                userProfile.getUser().getUsername(),
-                "/queue/notifications",
-                dto
-        );
+        if(userProfile.isNotificationsEnabled())
+
+            messagingTemplate.convertAndSendToUser(
+                    userProfile.getUser().getUsername(),
+                    "/queue/notifications",
+                    dto
+            );
     }
 
-    public List<NotificationDto.ResponseDto> getUserNotifications() {
+    public List<NotificationDto.ResponseDto> getUserNotificationsHistory(CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // In this case, don't have to find UserProfileId, inject userProfileRepository etc.

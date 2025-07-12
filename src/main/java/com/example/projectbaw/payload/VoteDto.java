@@ -16,7 +16,6 @@ public class VoteDto {
     public static class RequestDto {
 
         private String name;
-        private String author;
         private String category;
         private byte[] imageData;
         private List<VoteOptionDto.RequestDto> options;

@@ -1,9 +1,11 @@
 package com.example.projectbaw.controller;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.payload.VoteOptionDto;
 import com.example.projectbaw.service.VoteOptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,26 +32,26 @@ public class VoteOptionController {
     }
 
     @PostMapping("")
-    public ResponseEntity<VoteOptionDto.ResponseDto> create(@RequestBody VoteOptionDto.RequestDto dto) {
-        return ResponseEntity.ok(voteOptionService.create(dto));
+    public ResponseEntity<VoteOptionDto.ResponseDto> create(@RequestBody VoteOptionDto.RequestDto dto,@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(voteOptionService.create(dto,userDetails));
 
     }
 
     @PostMapping("/count")
-    public ResponseEntity<VoteOptionDto.ResponseDto> updateCount(@RequestBody VoteOptionDto.ResponseDto dto) {
+    public ResponseEntity<VoteOptionDto.ResponseDto> updateCount(@RequestBody VoteOptionDto.UpdateCountDto dto) {
         return ResponseEntity.ok(voteOptionService.updateCount(dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id, @RequestBody Long voteId) {
-        voteOptionService.deleteById(id,voteId);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @RequestBody Long voteId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        voteOptionService.deleteById(id,voteId,userDetails);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/upload/{id}")
-    public ResponseEntity<String> upload(@PathVariable Long id, @RequestParam("photo") MultipartFile file) throws IOException {
+    public ResponseEntity<String> upload(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam("photo") MultipartFile file) throws IOException {
 
-        voteOptionService.uploadImage(id,file.getBytes());
+        voteOptionService.uploadImage(id,file.getBytes(),userDetails);
 
         return ResponseEntity.ok("Picture added");
     }

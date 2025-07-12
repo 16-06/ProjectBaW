@@ -1,11 +1,13 @@
 package com.example.projectbaw.controller;
 
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.payload.UserProfileDto;
 import com.example.projectbaw.payload.WhoVotedYetDto;
 import com.example.projectbaw.service.WhoVotedYetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -20,17 +22,17 @@ public class WhoVotedYetController {
     private final WhoVotedYetService    whoVotedYetService;
 
     @PostMapping("")
-    public ResponseEntity<?> create(@RequestBody WhoVotedYetDto.RequestDto requestDto) {
+    public ResponseEntity<?> create(@RequestBody WhoVotedYetDto.RequestDto requestDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        WhoVotedYetDto.ResponseDto responseDto = whoVotedYetService.create(requestDto);
+        WhoVotedYetDto.ResponseDto responseDto = whoVotedYetService.create(requestDto,userDetails);
 
         return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/{voteId}")
-    public ResponseEntity<?> getById(@PathVariable Long voteId) {
+    public ResponseEntity<?> getById(@PathVariable Long voteId, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        boolean hasVoted = whoVotedYetService.hasUserVoted(voteId);
+        boolean hasVoted = whoVotedYetService.hasUserVoted(voteId,userDetails);
 
         return ResponseEntity.ok(new HashMap<String, Boolean>() {{
             put("hasVoted", hasVoted);

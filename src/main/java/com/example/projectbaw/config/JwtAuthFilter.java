@@ -1,5 +1,7 @@
 package com.example.projectbaw.config;
 
+import com.example.projectbaw.model.User;
+import com.example.projectbaw.repository.UserRepository;
 import io.github.bucket4j.*;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -24,6 +26,8 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
@@ -52,10 +56,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 Long userId = claims.get("id", Long.class);
                 String role = claims.get("role", String.class);
 
+                User user = userRepository.findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+                CustomUserDetails userDetails = new CustomUserDetails(user);
+
                 List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
                 UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(username, null, authorities);
+                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
                 request.setAttribute("username", username);
                 request.setAttribute("UserId", userId);

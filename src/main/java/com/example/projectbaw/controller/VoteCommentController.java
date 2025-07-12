@@ -1,9 +1,11 @@
 package com.example.projectbaw.controller;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.payload.VoteCommentDto;
 import com.example.projectbaw.service.VoteCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +18,9 @@ public class VoteCommentController {
     private final VoteCommentService voteCommentService;
 
     @PostMapping("")
-    public ResponseEntity<VoteCommentDto.ResponseDto> create(@RequestBody VoteCommentDto.RequestDto request) {
+    public ResponseEntity<VoteCommentDto.ResponseDto> create(@RequestBody VoteCommentDto.RequestDto request,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        return ResponseEntity.ok(voteCommentService.createComment(request));
+        return ResponseEntity.ok(voteCommentService.createComment(request,userDetails));
     }
 
     @GetMapping("/{id}")
@@ -35,9 +37,9 @@ public class VoteCommentController {
 
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        voteCommentService.deleteById(id);
+        voteCommentService.deleteById(id,userDetails);
         return ResponseEntity.ok().build();
 
     }

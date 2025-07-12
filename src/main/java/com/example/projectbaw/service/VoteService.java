@@ -1,6 +1,7 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.VoteMapper;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.Vote;
@@ -8,8 +9,6 @@ import com.example.projectbaw.payload.VoteDto;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -73,11 +72,13 @@ public class VoteService {
                 .map(voteMapper::toResponse);
     }
 
-    public VoteDto.ResponseDto createVote(VoteDto.RequestDto requestDto) {
+    public VoteDto.ResponseDto createVote(VoteDto.RequestDto requestDto, CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username)
+        // Old userAuth method change to @AuthenticationPrincipal
+        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // String username = (String) authentication.getPrincipal();
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(()-> new RuntimeException("User not found"));
 
         Vote vote = voteMapper.toEntity(requestDto);
@@ -89,11 +90,10 @@ public class VoteService {
         return voteMapper.toResponse(savedVote);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(Long id,CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(()-> new RuntimeException("User not found"));
         Vote vote = voteRepository.findByIdAndUserId(id,user.getId());
 
         if(vote != null){
@@ -106,11 +106,9 @@ public class VoteService {
 
     }
 
-    public void updateCategory(Long voteId, String newCategory) {
+    public void updateCategory(Long voteId, String newCategory,CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("User not found"));
         Vote vote = voteRepository.findByIdAndUserId(voteId,user.getId());
 
         if(vote!= null){
@@ -123,11 +121,9 @@ public class VoteService {
         }
     }
 
-    public void updateImage(Long voteId, byte[] newImage) {
+    public void updateImage(Long voteId, byte[] newImage,CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("User not found"));
         Vote vote = voteRepository.findByIdAndUserId(voteId,user.getId());
 
         if(vote != null){

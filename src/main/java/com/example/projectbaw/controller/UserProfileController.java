@@ -1,10 +1,12 @@
 package com.example.projectbaw.controller;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.payload.UserProfileDto;
 import com.example.projectbaw.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,9 +21,9 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateProfile(@RequestBody UserProfileDto.RequestDto request) {
+    public ResponseEntity<?> updateProfile(@RequestBody UserProfileDto.RequestDto request,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        userProfileService.updateProfile(request);
+        userProfileService.updateProfile(request,userDetails);
 
         return ResponseEntity.ok("Profile updated successfully");
 
@@ -37,9 +39,9 @@ public class UserProfileController {
     }
 
     @PutMapping("/upload-image")
-    public ResponseEntity<?> uploadImage(@RequestParam("photo") MultipartFile file) throws IOException {
+    public ResponseEntity<?> uploadImage(@AuthenticationPrincipal CustomUserDetails userDetails,@RequestParam("photo") MultipartFile file) throws IOException {
 
-        userProfileService.uploadImage(file.getBytes());
+        userProfileService.uploadImage(file.getBytes(),userDetails);
 
         return ResponseEntity.ok("Image uploaded successfully");
     }

@@ -1,5 +1,6 @@
 package com.example.projectbaw.config;
 
+import com.example.projectbaw.enums.Role;
 import com.example.projectbaw.model.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,21 +18,33 @@ import java.util.List;
 @Setter
 public class CustomUserDetails implements UserDetails {
 
-    private final User user;
+    public CustomUserDetails(User user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.role = user.getRole();
+        this.enabled = user.isEnabledAccount();
+    }
+
+    private final Long id;
+    private final String username;
+    private final String password;
+    private final Role role;
+    private final boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override
     public String getPassword(){
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return username;
     }
 
     @Override
@@ -51,11 +64,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
-    public User getUser() {
-        return user;
-    }
 
 }

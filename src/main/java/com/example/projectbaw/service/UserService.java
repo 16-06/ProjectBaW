@@ -1,5 +1,6 @@
 package com.example.projectbaw.service;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.config.JwtUtil;
 import com.example.projectbaw.mapper.UserMapper;
 import com.example.projectbaw.model.User;
@@ -175,15 +176,13 @@ public class UserService {
     }
 
     @Transactional
-    public boolean changePassword(String oldPassword, String newPassword){
+    public boolean changePassword(UserDto.ChangePassDto dto, CustomUserDetails userDetails){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("User not found"));
 
-        if(newPassword.length() < 8 && bCryptPasswordEncoder.matches(oldPassword, user.getPassword())){
+        if(dto.getNewPassword().length() > 8 && bCryptPasswordEncoder.matches(dto.getPassword(), user.getPassword())){
 
-                user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+                user.setPassword(bCryptPasswordEncoder.encode(dto.getNewPassword()));
                 userRepository.save(user);
                 return true;
         }
@@ -212,9 +211,11 @@ public class UserService {
         // Test method to check if the authenticated user is admin,
         // Manual check method not recommended for production use, for education only
         // Target Auth Method - @PreAuthorize("hasRole('ADMIN')") & SecurityFilterChain
+        // SecurityContextHolder.getContext() is old auth Method, Solution -> @AuthenticationPrincipal
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (String) authentication.getPrincipal();
+
         User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
 
         if(user.getRole() != Role.ADMIN ){

@@ -1,11 +1,13 @@
 package com.example.projectbaw.controller;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.enums.ResolutionStatus;
 import com.example.projectbaw.payload.ReportDto;
 import com.example.projectbaw.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,15 +18,15 @@ public class ReportController {
     private final ReportService reportService;
 
     @PostMapping("/user/create")
-    public ResponseEntity<?> createReport(@RequestBody ReportDto.RequestDto request) {
+    public ResponseEntity<?> createReport(@RequestBody ReportDto.RequestDto request,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        ReportDto.ResponseDto response = reportService.createReport(request);
+        ReportDto.ResponseDto response = reportService.createReport(request,userDetails);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user/reports")
-    public ResponseEntity<?> getUserReports() {
-        return ResponseEntity.ok(reportService.findUserReports());
+    public ResponseEntity<?> getUserReports(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(reportService.findUserReports(userDetails));
     }
 
     @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
@@ -34,9 +36,9 @@ public class ReportController {
     }
 
     @GetMapping("/user/checkStatus")
-    public ResponseEntity<?> checkReportStatus(@RequestBody Long reportId) {
+    public ResponseEntity<?> checkReportStatus(@RequestBody Long reportId,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        ReportDto.ResponseDto response = reportService.findReportById(reportId);
+        ReportDto.ResponseDto response = reportService.findReportById(reportId,userDetails);
         return ResponseEntity.ok(response);
     }
 

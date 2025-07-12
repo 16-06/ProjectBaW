@@ -44,7 +44,6 @@ public class VoteMapper {
         }
 
         Vote vote = new Vote();
-        vote.setAuthor(requestDto.getAuthor());
         vote.setCategory(requestDto.getCategory());
         vote.setName(requestDto.getName());
         vote.setImage(requestDto.getImageData());

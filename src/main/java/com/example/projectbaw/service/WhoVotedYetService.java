@@ -1,6 +1,7 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.UserProfileMapper;
 import com.example.projectbaw.mapper.WhoVotedYetMapper;
 import com.example.projectbaw.model.User;
@@ -10,8 +11,6 @@ import com.example.projectbaw.payload.WhoVotedYetDto;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.WhoVotedYetRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,11 +26,9 @@ public class WhoVotedYetService {
     private final WhoVotedYetMapper         whoVotedYetMapper;
     private final UserProfileMapper         userProfileMapper;
 
-    public WhoVotedYetDto.ResponseDto create(WhoVotedYetDto.RequestDto requestDto){
+    public WhoVotedYetDto.ResponseDto create(WhoVotedYetDto.RequestDto requestDto, CustomUserDetails userDetails){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(()-> new RuntimeException("User not found"));
 
         WhoVotedYet whoVotedYet = whoVotedYetMapper.toEntity(requestDto);
@@ -59,11 +56,11 @@ public class WhoVotedYetService {
 
     }
 
-    public boolean hasUserVoted(Long voteId) {
+    public boolean hasUserVoted(Long voteId,CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(()-> new RuntimeException("User not found"));
         Long userId = user.getId();
 
         return whoVotedYetRepository.existsByUserIdAndVoteId(userId, voteId);

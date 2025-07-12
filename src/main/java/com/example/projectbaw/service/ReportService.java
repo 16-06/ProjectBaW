@@ -1,6 +1,7 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.ReportMapper;
 import com.example.projectbaw.model.Report;
 import com.example.projectbaw.model.User;
@@ -9,8 +10,6 @@ import com.example.projectbaw.repository.ReportRepository;
 import com.example.projectbaw.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,12 +33,9 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
-    public List<ReportDto.ResponseDto> findUserReports(){
+    public List<ReportDto.ResponseDto> findUserReports(CustomUserDetails userDetails){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Report> reports = reportRepository.findByReporterId(user.getId());
@@ -54,12 +50,9 @@ public class ReportService {
 
     }
 
-    public ReportDto.ResponseDto findReportById(Long id) {
+    public ReportDto.ResponseDto findReportById(Long id,CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Report report = reportRepository.findById(id)
@@ -73,12 +66,9 @@ public class ReportService {
 
     }
 
-    public ReportDto.ResponseDto createReport(ReportDto.RequestDto request) {
+    public ReportDto.ResponseDto createReport(ReportDto.RequestDto request,CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-
-        User reporter = userRepository.findByUsername(username)
+        User reporter = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Report report = reportMapper.toEntity(request);

@@ -30,5 +30,12 @@ public class VoteOptionDto {
         private Long voteId;
 
     }
+
+    @Getter
+    @Setter
+    public static class UpdateCountDto {
+
+        private Long id;
+    }
 }
 

@@ -1,5 +1,6 @@
 package com.example.projectbaw.service;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.VoteOptionMapper;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.Vote;
@@ -10,8 +11,6 @@ import com.example.projectbaw.repository.VoteOptionRepository;
 import com.example.projectbaw.repository.VoteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,16 +38,13 @@ public class VoteOptionService {
 
     }
 
-    public VoteOptionDto.ResponseDto create(VoteOptionDto.RequestDto dto) {
+    public VoteOptionDto.ResponseDto create(VoteOptionDto.RequestDto dto, CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
 
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("User not found"));
         Vote vote = voteRepository.findById(dto.getVoteId()).orElseThrow(()-> new EntityNotFoundException("Vote not found"));
         Vote voteUser = voteRepository.findByIdAndUserId(dto.getVoteId(),user.getId());
 
-        //VoteOption saved = new VoteOption();
 
         if(voteUser != null) {
 
@@ -64,19 +60,21 @@ public class VoteOptionService {
         }
     }
 
-    public VoteOptionDto.ResponseDto updateCount(VoteOptionDto.ResponseDto dto) {
+    public VoteOptionDto.ResponseDto updateCount(VoteOptionDto.UpdateCountDto dto) {
         VoteOption voteOption = voteOptionRepository.findById(dto.getId())
                 .orElseThrow(()->new RuntimeException("Vote option not found"));
 
-        voteOption.setCount(dto.getCount());
+
+        voteOption.setCount(voteOption.getCount() + 1);
+
         return voteOptionMapper.toVoteOptionDto(voteOptionRepository.save(voteOption));
     }
 
-    public void deleteById(Long id,Long voteId) {
+    public void deleteById(Long id,Long voteId, CustomUserDetails userDetails) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
         Vote vote = voteRepository.findByIdAndUserId(voteId,user.getId());
 
         if(vote != null){
@@ -88,12 +86,10 @@ public class VoteOptionService {
 
     }
 
-    public void uploadImage(Long optionId, byte[] newImage){
+    public void uploadImage(Long optionId, byte[] newImage, CustomUserDetails userDetails){
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (String) authentication.getPrincipal();
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(()-> new RuntimeException("User not found"));
 
         VoteOption voteOption = voteOptionRepository.findById(optionId)

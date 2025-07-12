@@ -18,7 +18,6 @@ public class VoteCommentDto {
 
         private String commentBody;
         private Long voteId;
-        private Long commentAuthorId;
 
     }
 

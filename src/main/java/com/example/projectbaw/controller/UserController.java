@@ -1,11 +1,13 @@
 package com.example.projectbaw.controller;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -71,9 +73,9 @@ public class UserController {
     }
 
     @PutMapping("/changePassword")
-    public ResponseEntity<?> changePassword(@RequestBody UserDto.ChangePassDto requestDto) {
+    public ResponseEntity<?> changePassword(@RequestBody UserDto.ChangePassDto requestDto,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        boolean result = userService.changePassword(requestDto.getPassword(),requestDto.getNewPassword());
+        boolean result = userService.changePassword(requestDto,userDetails);
 
         if(result)
             return ResponseEntity.ok("Successful password change");

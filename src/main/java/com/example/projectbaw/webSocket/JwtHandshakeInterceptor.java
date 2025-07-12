@@ -24,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
-    // This interceptor executes when a WebSocket connection is attempted.
+    // Executes when a WebSocket connection is attempted.
     // Validate the JWT token and potentially reject the connection if the token is invalid.
 
     private final JwtUtil jwtUtil;

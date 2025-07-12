@@ -1,9 +1,12 @@
 package com.example.projectbaw.controller;
 
+import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.payload.VoteDto;
 import com.example.projectbaw.service.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,35 +54,35 @@ public class VoteController {
     }
 
     @PostMapping("")
-    public ResponseEntity<VoteDto.ResponseDto> createVote(@RequestBody VoteDto.RequestDto requestDto) {
+    public ResponseEntity<VoteDto.ResponseDto> createVote(@RequestBody VoteDto.RequestDto requestDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        VoteDto.ResponseDto responseDto = voteService.createVote(requestDto);
+        VoteDto.ResponseDto responseDto = voteService.createVote(requestDto,userDetails);
 
         return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteVote(@PathVariable Long id) {
+    public ResponseEntity<String> deleteVote(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
 
-        voteService.deleteById(id);
+        voteService.deleteById(id,userDetails);
 
         return ResponseEntity.ok("Vote deleted");
 
     }
 
     @PutMapping("/category/{voteId}")
-    public ResponseEntity<String> updateVote(@PathVariable Long voteId, @RequestBody String category) {
+    public ResponseEntity<String> updateVote(@PathVariable Long voteId, @RequestBody String category, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        voteService.updateCategory(voteId,category);
+        voteService.updateCategory(voteId,category,userDetails);
 
         return ResponseEntity.ok("Category updated");
     }
 
     @PutMapping("/upload/{voteId}")
-    public ResponseEntity<String> updateVote(@PathVariable Long voteId, @RequestParam("photo") MultipartFile file) throws IOException {
+    public ResponseEntity<String> updateVote(@PathVariable Long voteId, @AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam("photo") MultipartFile file) throws IOException {
 
-        voteService.updateImage(voteId, file.getBytes());
+        voteService.updateImage(voteId, file.getBytes(),userDetails);
 
         return ResponseEntity.ok("Image updated");
     }
