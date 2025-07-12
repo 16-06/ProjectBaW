@@ -2,16 +2,23 @@ package com.example.projectbaw.webSocket;
 
 import com.example.projectbaw.config.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -25,28 +32,35 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
 
-            //String authHeader = request.getHeaders().getFirst("Authorization");
+            HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
+            Cookie[] cookies = servletRequest.getCookies();
 
-            URI uri = request.getURI();
-            String authHeader = uri.getQuery();
+            if(cookies != null) {
+                Optional<String> CookieToken = Arrays.stream(cookies)
+                        .filter(cookie -> "jwt".equals(cookie.getName()))
+                        .map(Cookie::getValue)
+                        .findFirst();
 
-            System.out.println(">> Token: " + authHeader); // DEBUG
+            String token = CookieToken.get();
 
-            if (authHeader != null && authHeader.startsWith("token=")) {
-                String token = authHeader.substring(6);
 
-                Claims claims = jwtUtil.praseToken(token);
-                String username = claims.get("username", String.class);
+            Claims claims = jwtUtil.praseToken(token);
+            String username = claims.get("username", String.class);
 
-                attributes.put("jwtToken", token);
-                attributes.put("username", username);
+            attributes.put("jwtToken", token);
+            attributes.put("username", username);
 
-                return true;
-            } else {
+            return true;
+
+            }
+
+            else {
 
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return false;
             }
+
+
 
     }
 
