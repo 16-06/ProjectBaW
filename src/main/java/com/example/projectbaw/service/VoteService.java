@@ -1,6 +1,7 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.analytics.TrackAction;
 import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.VoteMapper;
 import com.example.projectbaw.model.User;
@@ -72,6 +73,7 @@ public class VoteService {
                 .map(voteMapper::toResponse);
     }
 
+    @TrackAction("VOTE_CREATED")
     public VoteDto.ResponseDto createVote(VoteDto.RequestDto requestDto, CustomUserDetails userDetails) {
 
         // Old userAuth method change to @AuthenticationPrincipal
