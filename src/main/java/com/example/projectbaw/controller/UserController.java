@@ -56,7 +56,7 @@ public class UserController {
     }
 
     @PostMapping("/public/login/2fa")
-    public ResponseEntity<?> login(@RequestBody UserDto.TwoFactorDto dto) {
+    public ResponseEntity<?> login2fa(@RequestBody UserDto.TwoFactorDto dto) {
 
         String verified = userService.verifyTwoFactorCode(dto.getUsername(), dto.getCode());
         return ResponseEntity.ok(verified);
