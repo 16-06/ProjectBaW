@@ -1,5 +1,6 @@
 package com.example.projectbaw.service;
 
+import com.example.projectbaw.analytics.TrackAction;
 import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.VoteCommentMapper;
 import com.example.projectbaw.model.User;
@@ -26,6 +27,7 @@ public class VoteCommentService {
     private final VoteCommentMapper voteCommentMapper;
     private final NotificationService notificationService;
 
+    @TrackAction(value = "VOTE_COMMENT_CREATED")
     public VoteCommentDto.ResponseDto createComment(VoteCommentDto.RequestDto requestDto, CustomUserDetails userDetails){
 
         User user = userRepository.findByUsername(userDetails.getUsername())

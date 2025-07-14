@@ -73,7 +73,7 @@ public class VoteService {
                 .map(voteMapper::toResponse);
     }
 
-    @TrackAction("VOTE_CREATED")
+    @TrackAction(value = "VOTE_CREATED")
     public VoteDto.ResponseDto createVote(VoteDto.RequestDto requestDto, CustomUserDetails userDetails) {
 
         // Old userAuth method change to @AuthenticationPrincipal
