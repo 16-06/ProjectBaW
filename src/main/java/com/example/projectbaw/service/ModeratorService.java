@@ -28,13 +28,13 @@ public class ModeratorService {
     public void deleteUserProfile(Long id)  {userProfileRepository.deleteById(id);}
     public void deleteVoteComment(Long id)  {voteCommentRepository.deleteById(id);}
 
-    public List<UserDto.ResponseDto> getAllUsers(){
+    public List<UserDto.FullUserDto> getAllUsers(){
 
         List<User> users = userRepository.findAll();
 
         return users
                 .stream()
-                .map(userMapper::toUserDto)
+                .map(userMapper::toFullUserDto)
                 .collect(Collectors.toList());
     }
 

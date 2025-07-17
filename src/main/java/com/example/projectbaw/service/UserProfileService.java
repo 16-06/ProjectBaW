@@ -25,10 +25,13 @@ public class UserProfileService {
         UserProfile profile = userProfileRepository.findById(user.getId())
                 .orElse(new UserProfile());
 
-        UserProfile updatedProfile = userProfileMapper.toEntity(profileDto);
-        updatedProfile.setId(user.getId());
-        updatedProfile.setUser(user);
-        userProfileRepository.save(updatedProfile);
+        profile.setFirstName(profileDto.getFirstName());
+        profile.setLastName(profileDto.getLastName());
+        profile.setBio(profileDto.getBio());
+        profile.setInterests(profileDto.getInterests());
+        profile.setUser(user);
+
+        userProfileRepository.save(profile);
 
     }
 

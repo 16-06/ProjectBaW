@@ -43,5 +43,21 @@ public class UserMapper {
 
         return user;
     }
+
+    public UserDto.FullUserDto toFullUserDto(User user) {
+        if(user == null) {
+            return null;
+        }
+
+        UserDto.FullUserDto fullUserDto = new UserDto.FullUserDto();
+        fullUserDto.setId(user.getId());
+        fullUserDto.setUsername(user.getUsername());
+        fullUserDto.setEmail(user.getEmail());
+        fullUserDto.setRole(user.getRole());
+        fullUserDto.setTwoFactorEnabled(user.isTwoFactorEnabled());
+        fullUserDto.setBannedAccount(user.isBannedAccount());
+        fullUserDto.setEnabledAccount(user.isEnabledAccount());
+        return fullUserDto;
+    }
 }
 

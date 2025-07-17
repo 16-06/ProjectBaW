@@ -140,4 +140,19 @@ public class VoteService {
         }
     }
 
+    public Long getAuthorUserId(Long voteId, CustomUserDetails userDetails) {
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        Optional<Vote> vote = voteRepository.findById(voteId);
+
+        if(vote.isPresent()){
+            return vote.get().getUser().getId();
+        }
+        else{
+            throw new RuntimeException("Author not found for the given vote ID");
+        }
+    }
+
 }

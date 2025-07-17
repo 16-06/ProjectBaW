@@ -17,7 +17,7 @@ public class AdminController {
 
    private final AdminService adminService;
 
-    @PostMapping("/change-role")
+    @PutMapping("/change-role")
     public ResponseEntity<String> changeRole(@RequestBody AdminDto.ChangeRoleDto changeRoleDto) {
 
         adminService.changeUserRole(changeRoleDto);
@@ -25,7 +25,7 @@ public class AdminController {
 
     }
 
-    @PostMapping("/block-user")
+    @PutMapping("/block-user")
     public ResponseEntity<String> blockUser(@RequestBody AdminDto.BanUserDto banUserDto) {
 
         adminService.blockUser(banUserDto);
@@ -34,7 +34,7 @@ public class AdminController {
 
     }
 
-    @PostMapping("/unblock-user")
+    @PutMapping("/unblock-user")
     public ResponseEntity<String> unblockUser(@RequestBody Long id) {
 
         adminService.unblockUser(id);

@@ -1,5 +1,6 @@
 package com.example.projectbaw.payload;
 
+import com.example.projectbaw.enums.Role;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -81,5 +82,17 @@ public class UserDto {
     public static class LoginDto {
         private String username;
         private String password;
+    }
+
+    @Getter
+    @Setter
+    public static class FullUserDto {
+        private Long id;
+        private String username;
+        private String email;
+        private boolean enabledAccount;
+        private boolean twoFactorEnabled;
+        private boolean bannedAccount;
+        private Role role;
     }
 }

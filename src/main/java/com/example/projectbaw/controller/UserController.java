@@ -34,7 +34,7 @@ public class UserController {
         Optional<String> token = userService.login(requestDto);
 
         if(token.isEmpty() && !userService.isAccountEnabled(requestDto.getUsername())){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not activated, check your email for activation link");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account not activated, check your email for activation link");
         }
 
         if(token.isEmpty() && userService.isAccountBanned(requestDto.getUsername())){

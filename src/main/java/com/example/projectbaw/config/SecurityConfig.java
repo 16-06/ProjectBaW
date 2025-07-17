@@ -67,7 +67,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(userInfo ->
                                 userInfo.userService(customO2Auth))
-                        .loginPage("/oauth2/authorization/google")
+                        //.loginPage("/oauth2/authorization/google")
                         .successHandler(oAuth2LoginSuccessHandler)
                 )
                 .exceptionHandling(ex -> ex

@@ -87,6 +87,14 @@ public class VoteController {
         return ResponseEntity.ok("Image updated");
     }
 
+    @GetMapping("/getAuthorId/{voteId}")
+    public ResponseEntity<Long> getAuthorId(@PathVariable Long voteId,@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Long authorId = voteService.getAuthorUserId(voteId,userDetails);
+
+        return ResponseEntity.ok(authorId);
+    }
+
 
 
 

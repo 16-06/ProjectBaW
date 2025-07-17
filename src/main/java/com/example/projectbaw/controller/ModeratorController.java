@@ -18,9 +18,9 @@ public class ModeratorController {
     private final ModeratorService moderatorService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserDto.ResponseDto>> getAllUsers() {
+    public ResponseEntity<List<UserDto.FullUserDto>> getAllUsers() {
 
-        List<UserDto.ResponseDto> users = moderatorService.getAllUsers();
+        List<UserDto.FullUserDto> users = moderatorService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 

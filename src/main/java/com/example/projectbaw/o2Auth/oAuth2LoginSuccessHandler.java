@@ -37,15 +37,25 @@ public class oAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         String token = jwtUtil.generateToken(user);
 
+
+        response.setStatus(HttpServletResponse.SC_FOUND);
+        response.setHeader("Location", frontUrl);
+
         Cookie cookie = new Cookie("token", token);
-        //cookie.setHttpOnly(true);
-        //cookie.setSecure(true);
+
+        cookie.setHttpOnly(false);  // Only for testing purposes, both should be true in production
+        cookie.setSecure(false);    // But in frontend wasn't fully modified to work with cookies
+                                    // JWT token is extracted from cookies and stored in localStorage
+
+                                    // This is not secure, but it is a temporary solution and token should fully store in cookies
+                                    // This is because I did not write frontend from scratch like this project
+                                    // Only modified the old version of the React project
         cookie.setPath("/");
-        cookie.setMaxAge(7 * 24 * 60 * 60);
+        cookie.setMaxAge(3600*24);
         response.addCookie(cookie);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"status\": \"ok\"}");
 
-
-
-        response.sendRedirect(frontUrl);
+        //response.sendRedirect(frontUrl);
     }
 }
