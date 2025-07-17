@@ -32,9 +32,9 @@ public class UserProfileService {
 
     }
 
-    public UserProfileDto.ResponseDto getUserProfile(String username) {
+    public UserProfileDto.ResponseDto getUserProfile(Long id) {
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         UserProfile profile = userProfileRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("User profile not found"));

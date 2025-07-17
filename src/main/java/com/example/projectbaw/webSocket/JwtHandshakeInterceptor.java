@@ -11,6 +11,7 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
@@ -41,8 +42,10 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                         .map(Cookie::getValue)
                         .findFirst();
 
-            String token = CookieToken.get();
+            if(CookieToken.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);}
 
+            String token = CookieToken.get();
 
             Claims claims = jwtUtil.praseToken(token);
             String username = claims.get("username", String.class);

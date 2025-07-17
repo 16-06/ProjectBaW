@@ -10,6 +10,7 @@ import com.example.projectbaw.payload.UserDto;
 import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.UserSecurityRepository;
 import com.example.projectbaw.enums.Role;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -74,9 +75,13 @@ public class UserService {
 
     public boolean isAccountEnabled(String username) {
 
-        return userRepository.findByUsername(username)
-                .map(User::isEnabledAccount)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+//        return userRepository.findByUsername(username)
+//                .map(User::isEnabledAccount)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.isEnabledAccount();
     }
 
     public boolean isTwoFactorEnabled(String username) {
@@ -138,9 +143,9 @@ public class UserService {
     }
 
 
-    public String verifyTwoFactorCode(String username, String code) {
+    public String verifyTwoFactorCode(UserDto.TwoFactorDto twoFactorDto) {
 
-        Optional<User> userOptional= userRepository.findByUsername(username);
+        Optional<User> userOptional= userRepository.findByUsername(twoFactorDto.getUsername());
 
         if(userOptional.isEmpty()){
             throw new RuntimeException("User not found");
@@ -156,7 +161,7 @@ public class UserService {
             throw new RuntimeException("Two-factor code has expired");
         }
 
-        if(user.getSecurityData().getTwoFactorCode().equals(code)) {
+        if(user.getSecurityData().getTwoFactorCode().equals(twoFactorDto.getCode())) {
 
             user.getSecurityData().setTwoFactorCode(null);
             user.getSecurityData().setCodeExpiryTime(null);
@@ -233,14 +238,27 @@ public class UserService {
 
         String username = (String) request.getAttribute("username");
         Long userId = (Long) request.getAttribute("UserId");
+        String token = null;
 
         if (username == null || userId == null) {
             return null;
         }
 
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("o2auth".equals(cookie.getName())) {
+                     token = cookie.getValue();
+                     System.out.println("Token: " + token);
+                    break;
+                }
+            }
+        }
+
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("id", userId);
         userInfo.put("username", username);
+        userInfo.put("token", token);
 
         return userInfo;
     }

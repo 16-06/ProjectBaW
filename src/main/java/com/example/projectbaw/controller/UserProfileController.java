@@ -29,10 +29,10 @@ public class UserProfileController {
 
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<?> getProfile(@RequestBody UserDto.getProfileDto request) {
+    @GetMapping("/public/{id}")
+    public ResponseEntity<?> getProfile(@PathVariable Long id) {
 
-        UserProfileDto.ResponseDto profile = userProfileService.getUserProfile(request.getUsername());
+        UserProfileDto.ResponseDto profile = userProfileService.getUserProfile(id);
 
         return ResponseEntity.ok(profile);
 

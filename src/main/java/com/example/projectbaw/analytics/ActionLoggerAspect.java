@@ -52,7 +52,10 @@ public class ActionLoggerAspect {
                 return "Vote : " + vote.getName();
             }
             else if (arg instanceof VoteCommentDto.RequestDto comment) {
-                return "Comment from: " + comment.getCommentBody().substring(15) +" ...";
+
+                String commentText = comment.getCommentBody().length() <= 10 ? comment.getCommentBody() : comment.getCommentBody().substring(0, 10) + "...";
+
+                return "Comment from: " + commentText;
             }
             else if (arg instanceof VoteOptionDto.RequestDto option) {
                 return "Vote option : " + option.getName();

@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -22,6 +23,9 @@ public class oAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
+    @Value("${app.frontend-url}")
+    private String frontUrl;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication ) throws IOException, ServletException {
 
@@ -34,12 +38,14 @@ public class oAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String token = jwtUtil.generateToken(user);
 
         Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        //cookie.setHttpOnly(true);
+        //cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(7 * 24 * 60 * 60);
         response.addCookie(cookie);
 
-        response.sendRedirect("http://localhost:3000/");
+
+
+        response.sendRedirect(frontUrl);
     }
 }

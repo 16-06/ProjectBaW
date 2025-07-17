@@ -61,6 +61,7 @@ public class VoteService {
     }
 
     public List<VoteDto.ResponseDto> getByUserId(Long id) {
+
         return voteRepository.findByUserId(id)
                 .stream()
                 .map(voteMapper::toResponse)

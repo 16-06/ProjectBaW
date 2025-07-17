@@ -31,15 +31,15 @@ public class UserController {
     @PostMapping("/public/login")
     public ResponseEntity<?> loginUser(@RequestBody UserDto.LoginDto requestDto) {
 
-        if(!userService.isAccountEnabled(requestDto.getUsername())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account not activated or does not exist");
+        Optional<String> token = userService.login(requestDto);
+
+        if(token.isEmpty() && !userService.isAccountEnabled(requestDto.getUsername())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not activated, check your email for activation link");
         }
 
-        if(userService.isAccountBanned(requestDto.getUsername())){
+        if(token.isEmpty() && userService.isAccountBanned(requestDto.getUsername())){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account is banned, check your email for more information");
         }
-
-        Optional<String> token = userService.login(requestDto);
 
         if (token.isEmpty() && userService.isTwoFactorEnabled(requestDto.getUsername())) {
             return ResponseEntity.accepted()
@@ -58,7 +58,7 @@ public class UserController {
     @PostMapping("/public/login/2fa")
     public ResponseEntity<?> login2fa(@RequestBody UserDto.TwoFactorDto dto) {
 
-        String verified = userService.verifyTwoFactorCode(dto.getUsername(), dto.getCode());
+        String verified = userService.verifyTwoFactorCode(dto);
         return ResponseEntity.ok(verified);
 
 

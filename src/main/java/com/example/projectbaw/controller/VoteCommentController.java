@@ -24,7 +24,7 @@ public class VoteCommentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VoteCommentDto.ResponseDto> getById(@RequestBody Long id) {
+    public ResponseEntity<VoteCommentDto.ResponseDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(voteCommentService.getById(id));
 
     }
@@ -37,10 +37,10 @@ public class VoteCommentController {
 
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> delete(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
         voteCommentService.deleteById(id,userDetails);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Comment deleted successfully");
 
     }
 }

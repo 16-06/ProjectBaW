@@ -74,13 +74,13 @@ public class VoteCommentService {
 
     public void deleteById(Long id,CustomUserDetails userDetails) {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(()-> new RuntimeException("User not found"));
+        VoteComment voteComment = voteCommentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vote comment not found"));;
 
-        VoteComment voteComment = voteCommentRepository.findByIdAndCommentAuthorId(id,user.getId());
+        if(voteComment != null &&
+                (voteComment.getCommentAuthor().getId() == userDetails.getId() || voteComment.getVote().getUser().getId() == userDetails.getId())) {
 
-        if(voteComment != null){
-            voteRepository.deleteById(id);
+            voteCommentRepository.deleteById(id);
         }
         else{
             throw new RuntimeException("Vote not belongs to user");

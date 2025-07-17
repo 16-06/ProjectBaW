@@ -43,7 +43,8 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/api/users/public/**",
                                         "/api/vote/public/**",
-                                        "/api/oauth2/**"
+                                        "/api/profile/public/**",
+                                        "/oauth2/**"
                                 ).permitAll()
                                 .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(
