@@ -1,6 +1,7 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.analytics.TrackAction;
 import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.ReportMapper;
 import com.example.projectbaw.model.Report;
@@ -66,6 +67,7 @@ public class ReportService {
 
     }
 
+    @TrackAction(value = "NEW_REPORT_CREATED")
     public ReportDto.ResponseDto createReport(ReportDto.RequestDto request,CustomUserDetails userDetails) {
 
         User reporter = userRepository.findByUsername(userDetails.getUsername())
@@ -78,6 +80,7 @@ public class ReportService {
         return reportMapper.toResponseDto(report);
     }
 
+    @TrackAction(value = "REPORT_STATUS_CHANGED")
     public ReportDto.ResponseDto changeReportStatus(ReportDto.ChangeStatusDto changeStatusDto) {
 
         Report report = reportRepository.findById(changeStatusDto.getId())

@@ -93,6 +93,7 @@ public class VoteService {
         return voteMapper.toResponse(savedVote);
     }
 
+    @TrackAction(value = "VOTE_DELETED")
     public void deleteById(Long id,CustomUserDetails userDetails) {
 
         User user = userRepository.findByUsername(userDetails.getUsername())
@@ -109,6 +110,7 @@ public class VoteService {
 
     }
 
+    @TrackAction(value = "VOTE_EDITED")
     public void updateCategory(Long voteId, String newCategory,CustomUserDetails userDetails) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("User not found"));
@@ -124,6 +126,7 @@ public class VoteService {
         }
     }
 
+    @TrackAction(value = "VOTE_EDITED")
     public void updateImage(Long voteId, byte[] newImage,CustomUserDetails userDetails) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(()-> new RuntimeException("User not found"));

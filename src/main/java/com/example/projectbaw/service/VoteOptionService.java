@@ -1,5 +1,6 @@
 package com.example.projectbaw.service;
 
+import com.example.projectbaw.analytics.TrackAction;
 import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.VoteOptionMapper;
 import com.example.projectbaw.model.User;
@@ -38,6 +39,7 @@ public class VoteOptionService {
 
     }
 
+    @TrackAction(value = "VOTE_OPTION_CREATED")
     public VoteOptionDto.ResponseDto create(VoteOptionDto.RequestDto dto, CustomUserDetails userDetails) {
 
 
@@ -70,6 +72,7 @@ public class VoteOptionService {
         return voteOptionMapper.toVoteOptionDto(voteOptionRepository.save(voteOption));
     }
 
+    @TrackAction(value = "VOTE_OPTION_DELETED")
     public void deleteById(Long id,Long voteId, CustomUserDetails userDetails) {
 
         User user = userRepository.findByUsername(userDetails.getUsername())
@@ -86,6 +89,7 @@ public class VoteOptionService {
 
     }
 
+    @TrackAction(value = "VOTE_OPTION_EDITED")
     public void uploadImage(Long optionId, byte[] newImage, CustomUserDetails userDetails){
 
 

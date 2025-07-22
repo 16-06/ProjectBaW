@@ -1,6 +1,7 @@
 package com.example.projectbaw.service;
 
 
+import com.example.projectbaw.analytics.TrackAction;
 import com.example.projectbaw.config.CustomUserDetails;
 import com.example.projectbaw.mapper.UserProfileMapper;
 import com.example.projectbaw.mapper.WhoVotedYetMapper;
@@ -26,6 +27,7 @@ public class WhoVotedYetService {
     private final WhoVotedYetMapper         whoVotedYetMapper;
     private final UserProfileMapper         userProfileMapper;
 
+    @TrackAction(value = "VOTED")
     public WhoVotedYetDto.ResponseDto create(WhoVotedYetDto.RequestDto requestDto, CustomUserDetails userDetails){
 
         User user = userRepository.findByUsername(userDetails.getUsername())

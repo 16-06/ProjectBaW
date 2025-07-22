@@ -72,10 +72,11 @@ public class VoteCommentService {
                 .toList();
     }
 
+    @TrackAction(value = "VOTE_COMMENT_DELETED")
     public void deleteById(Long id,CustomUserDetails userDetails) {
 
         VoteComment voteComment = voteCommentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vote comment not found"));;
+                .orElseThrow(() -> new RuntimeException("Vote comment not found"));
 
         if(voteComment != null &&
                 (voteComment.getCommentAuthor().getId() == userDetails.getId() || voteComment.getVote().getUser().getId() == userDetails.getId())) {

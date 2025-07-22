@@ -9,6 +9,12 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  DB_URL: ${{ secrets.DB_URL }}
+  DB_PASS: ${{ secrets.DB_PASS }}
+  MAIL_PASS: ${{ secrets.MAIL_PASS }}
+  GOOGLE_PASS: ${{ secrets.GOOGLE_PASS }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
