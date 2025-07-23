@@ -44,7 +44,7 @@ public class oAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         Cookie cookie = new Cookie("token", token);
 
         cookie.setHttpOnly(false);  // Only for testing purposes, both should be true in production
-        cookie.setSecure(false);    // But in frontend wasn't fully modified to work with cookies
+        cookie.setSecure(true);    // But in frontend wasn't fully modified to work with cookies
                                     // JWT token is extracted from cookies and stored in localStorage
 
                                     // This is not secure, but it is a temporary solution and token should fully store in cookies
