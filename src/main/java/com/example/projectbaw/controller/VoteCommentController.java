@@ -37,7 +37,7 @@ public class VoteCommentController {
 
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<String> delete(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
         voteCommentService.deleteById(id,userDetails);
         return ResponseEntity.ok("Comment deleted successfully");

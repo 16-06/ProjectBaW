@@ -234,7 +234,7 @@ public class UserService {
 
     }
 
-    public Map<String, Object> getAuthenticatedUserInfo(HttpServletRequest request){
+    public UserDto.AuthenticatedUserDto getAuthenticatedUserInfo(HttpServletRequest request){
 
         String username = (String) request.getAttribute("username");
         Long userId = (Long) request.getAttribute("UserId");
@@ -255,10 +255,11 @@ public class UserService {
             }
         }
 
-        Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("id", userId);
-        userInfo.put("username", username);
-        userInfo.put("token", token);
+        UserDto.AuthenticatedUserDto userInfo = new UserDto.AuthenticatedUserDto();
+
+        userInfo.setUsername(username);
+        userInfo.setId(userId);
+        userInfo.setToken(token);
 
         return userInfo;
     }

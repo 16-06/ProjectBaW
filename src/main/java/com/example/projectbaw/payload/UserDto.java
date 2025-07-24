@@ -62,16 +62,10 @@ public class UserDto {
 
     }
 
-    @Getter
-    @Setter
-    public static class getProfileDto {
-        private String username;
-
-    }
 
     @Getter
     @Setter
-    public static class TwoFactorDto  {
+    public static class TwoFactorDto {
         private String username;
         private String code;
 
@@ -94,5 +88,13 @@ public class UserDto {
         private boolean twoFactorEnabled;
         private boolean bannedAccount;
         private Role role;
+    }
+
+    @Getter
+    @Setter
+    public static class AuthenticatedUserDto {
+        private Long id;
+        private String username;
+        private String token;
     }
 }

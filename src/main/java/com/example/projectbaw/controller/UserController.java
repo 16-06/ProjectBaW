@@ -21,7 +21,7 @@ public class UserController {
     private final UserService       userService;
 
     @PostMapping("/public/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserDto.RegisterDto request) {
+    public ResponseEntity<String> registerUser(@RequestBody UserDto.RegisterDto request) {
 
         userService.registerUser(request);
         return ResponseEntity.ok("Successfully registered");
@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/public/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserDto.LoginDto requestDto) {
+    public ResponseEntity<String> loginUser(@RequestBody UserDto.LoginDto requestDto) {
 
         Optional<String> token = userService.login(requestDto);
 
@@ -56,7 +56,7 @@ public class UserController {
     }
 
     @PostMapping("/public/login/2fa")
-    public ResponseEntity<?> login2fa(@RequestBody UserDto.TwoFactorDto dto) {
+    public ResponseEntity<String> login2fa(@RequestBody UserDto.TwoFactorDto dto) {
 
         String verified = userService.verifyTwoFactorCode(dto);
         return ResponseEntity.ok(verified);
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/info/{id}")
-    public ResponseEntity<?> getBasicInfo(@PathVariable Long id) {
+    public ResponseEntity<UserDto.ResponseDto> getBasicInfo(@PathVariable Long id) {
 
         return userService.getById(id)
                 .map(ResponseEntity::ok)
@@ -73,7 +73,7 @@ public class UserController {
     }
 
     @PutMapping("/changePassword")
-    public ResponseEntity<?> changePassword(@RequestBody UserDto.ChangePassDto requestDto,@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<String> changePassword(@RequestBody UserDto.ChangePassDto requestDto,@AuthenticationPrincipal CustomUserDetails userDetails) {
 
         boolean result = userService.changePassword(requestDto,userDetails);
 
@@ -84,21 +84,25 @@ public class UserController {
     }
 
     @GetMapping("/public/auth")
-    public ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request) {
+    public ResponseEntity<UserDto.AuthenticatedUserDto> getAuthenticatedUser(HttpServletRequest request) {
 
-        Map<String, Object> userInfo = userService.getAuthenticatedUserInfo(request);
+        UserDto.AuthenticatedUserDto userInfo = userService.getAuthenticatedUserInfo(request);
 
         if (userInfo == null) {
-            return ResponseEntity.status(401).body("Unauthorized");
+            return ResponseEntity.status(401).build();
         }
 
         return ResponseEntity.ok(userInfo);
     }
 
     @GetMapping("/check")
-    public ResponseEntity<?> getUsersByAdmin() {
+    public ResponseEntity<List<UserDto.ResponseDto>> getUsersByAdmin() {
 
         List<UserDto.ResponseDto> users = userService.adminGetAllUsers();
+
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
 
         return ResponseEntity.ok(users);
 
@@ -118,7 +122,7 @@ public class UserController {
     }
 
     @PostMapping("/public/password-reset-request")
-    public ResponseEntity<?> passwordResetRequestByEmail(@RequestBody UserDto.passwordResetRequestDto requestDto) {
+    public ResponseEntity<String> passwordResetRequestByEmail(@RequestBody UserDto.passwordResetRequestDto requestDto) {
 
             userService.PasswordResetByEmail(requestDto.getEmail());
             return ResponseEntity.ok("Password reset email sent");
