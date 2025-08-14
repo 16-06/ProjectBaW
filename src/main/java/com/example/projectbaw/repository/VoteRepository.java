@@ -3,6 +3,7 @@ package com.example.projectbaw.repository;
 import com.example.projectbaw.model.User;
 import com.example.projectbaw.model.Vote;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,5 +20,8 @@ public interface VoteRepository extends JpaRepository<Vote,Long> {
     List<Vote>  findByUserId(long userId);
 
     Vote        findByIdAndUserId(long voteId, long userId);
+
+    @Query("SELECT v FROM Vote v LEFT JOIN FETCH v.voteOptions")
+    List<Vote> findAllWithOptions();
 
 }

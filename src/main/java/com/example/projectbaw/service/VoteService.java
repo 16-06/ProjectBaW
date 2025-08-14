@@ -11,6 +11,7 @@ import com.example.projectbaw.repository.UserRepository;
 import com.example.projectbaw.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class VoteService {
 
     public List<VoteDto.ResponseDto> getAllVotes() {
 
-        return voteRepository.findAll()
+        return voteRepository.findAllWithOptions()
                 .stream()
                 .map(voteMapper::toResponse)
                 .collect(Collectors.toList());
@@ -78,8 +79,8 @@ public class VoteService {
     public VoteDto.ResponseDto createVote(VoteDto.RequestDto requestDto, CustomUserDetails userDetails) {
 
         // Old userAuth method change to @AuthenticationPrincipal
-        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // String username = (String) authentication.getPrincipal();
+            // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            // String username = (String) authentication.getPrincipal();
 
         User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(()-> new RuntimeException("User not found"));

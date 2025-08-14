@@ -105,6 +105,18 @@ public class UserController {
         }
 
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/getAuth")
+    public ResponseEntity<UserDto.AuthenticatedUserDto> getAuthenticatedUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        UserDto.AuthenticatedUserDto user = userService.getAuthContext(userDetails);
+
+        if(user == null){
+            return ResponseEntity.status(401).build();
+        }
+
+        return ResponseEntity.ok(user);
 
     }
 

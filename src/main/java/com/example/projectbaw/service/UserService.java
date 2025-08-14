@@ -78,16 +78,17 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-//        return userRepository.findByUsername(username)
-//                .map(User::isEnabledAccount)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
         return user.isEnabledAccount();
+
+        //        return userRepository.findByUsername(username)
+        //              .map(User::isEnabledAccount)
+        //              .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public boolean isTwoFactorEnabled(String username) {
 
         return userRepository.findByUsername(username)
-                .map(User::isEnabledAccount)
+                .map(User::isTwoFactorEnabled)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
@@ -260,6 +261,15 @@ public class UserService {
         userInfo.setUsername(username);
         userInfo.setId(userId);
         userInfo.setToken(token);
+
+        return userInfo;
+    }
+
+    public UserDto.AuthenticatedUserDto getAuthContext(CustomUserDetails userDetails) {
+
+        UserDto.AuthenticatedUserDto userInfo = new UserDto.AuthenticatedUserDto();
+        userInfo.setId(userDetails.getId());
+        userInfo.setUsername(userDetails.getUsername());
 
         return userInfo;
     }
