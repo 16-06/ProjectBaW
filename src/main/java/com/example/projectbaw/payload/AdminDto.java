@@ -14,6 +14,7 @@ public class AdminDto {
 
     @Getter
     @Setter
+    @Data
     public static class ChangeRoleDto {
 
         private Long userId;
@@ -23,6 +24,7 @@ public class AdminDto {
 
     @Getter
     @Setter
+    @Data
     public static class BanUserDto  {
 
         private Long userId;

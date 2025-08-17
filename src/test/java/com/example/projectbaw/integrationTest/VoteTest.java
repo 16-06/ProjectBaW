@@ -10,23 +10,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class VoteTest {
 
     @Autowired
@@ -162,6 +163,53 @@ public class VoteTest {
 
         Mockito.verify(voteService,Mockito.times(1))
                 .getAuthorUserId(Mockito.eq(voteId),Mockito.any());
+
+    }
+
+    @Test
+    void shouldUploadPhoto() throws Exception{
+
+        //given
+        Long voteId = 1L;
+        byte[] photo = "test".getBytes();
+
+        MockMultipartFile file = new MockMultipartFile("photo", photo);
+
+        //when + then
+
+        mockMvc.perform(multipart("/api/vote/upload/{voteId}", voteId)
+                .file(file)
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                })
+                .with(user("testUser").password("pass").roles("USER")))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Image updated"));
+
+        //verify
+        Mockito.verify(voteService,Mockito.times(1))
+                .updateImage(Mockito.eq(voteId),Mockito.eq(photo),Mockito.any());
+    }
+
+    @Test
+    void shouldUpdateCategory() throws Exception{
+
+        //given
+        Long voteId = 1L;
+        String category = "test";
+
+        mockMvc.perform(put("/api/vote/category/{voteId}", voteId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(category)
+                    .with(user("testUser").password("pass").roles("USER"))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string("Category updated"));
+
+        Mockito.verify(voteService,Mockito.times(1))
+                .updateCategory(Mockito.eq(voteId),Mockito.eq(category),Mockito.any());
+
     }
 
 
